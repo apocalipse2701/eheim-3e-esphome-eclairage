@@ -1,0 +1,99 @@
+# Cartes Lovelace (Mushroom + card-mod requis, installables via HACS).
+# Tableau de bord -> Modifier -> Ajouter une carte -> Manuel, puis coller l'une des cartes.
+# Les noms d'entités supposent un appareil ESPHome nommé « eheim-3e ».
+type: vertical-stack
+card_mod:
+  style: '#root { gap: 0 !important; }'
+cards:
+- type: custom:mushroom-template-card
+  entity: select.eheim_3e_mode_eclairage
+  primary: Éclairage LED
+  secondary: '{{ states(''select.eheim_3e_mode_eclairage'') }} · lever {{ states(''time.eheim_3e_lever_heure_de_debut'')[:5] }} · coucher {{ states(''time.eheim_3e_coucher_heure_de_debut'')[:5] }}'
+  icon: mdi:weather-sunset
+  icon_color: '{{ ''amber'' if is_state(''light.eheim_3e_eclairage_canal_1'',''on'') or is_state(''light.eheim_3e_eclairage_canal_2'',''on'') else ''disabled'' }}'
+  tap_action:
+    action: more-info
+    entity: select.eheim_3e_mode_eclairage
+  card_mod:
+    style: 'ha-card { padding: 8px 12px 4px !important; border-bottom: none !important; border-bottom-left-radius: 0 !important; border-bottom-right-radius: 0 !important; }'
+- type: custom:mushroom-chips-card
+  alignment: justify
+  chips:
+  - type: template
+    icon: mdi:theme-light-dark
+    content: Auto
+    icon_color: '{{ ''amber'' if is_state(''select.eheim_3e_mode_eclairage'',''Automatique'') else ''disabled'' }}'
+    tap_action:
+      action: perform-action
+      perform_action: select.select_option
+      target:
+        entity_id: select.eheim_3e_mode_eclairage
+      data:
+        option: Automatique
+  - type: template
+    icon: mdi:lightbulb-on
+    content: Allumé
+    icon_color: '{{ ''yellow'' if is_state(''select.eheim_3e_mode_eclairage'',''Forcé allumé'') else ''disabled'' }}'
+    tap_action:
+      action: perform-action
+      perform_action: select.select_option
+      target:
+        entity_id: select.eheim_3e_mode_eclairage
+      data:
+        option: Forcé allumé
+  - type: template
+    icon: mdi:lightbulb-off-outline
+    content: Éteint
+    icon_color: '{{ ''blue'' if is_state(''select.eheim_3e_mode_eclairage'',''Forcé éteint'') else ''disabled'' }}'
+    tap_action:
+      action: perform-action
+      perform_action: select.select_option
+      target:
+        entity_id: select.eheim_3e_mode_eclairage
+      data:
+        option: Forcé éteint
+  card_mod:
+    style: 'ha-card { border-top: none !important; border-bottom: none !important; border-radius: 0 !important; margin-top: 0 !important; } ha-card { padding: 4px 8px 8px !important; }'
+- type: custom:mushroom-light-card
+  entity: light.eheim_3e_eclairage_canal_1
+  name: Canal 1
+  icon: mdi:led-strip-variant
+  show_brightness_control: true
+  use_light_color: false
+  collapsible_controls: false
+  tap_action:
+    action: more-info
+  card_mod:
+    style: 'ha-card { border-top: none !important; border-bottom: none !important; border-radius: 0 !important; margin-top: 0 !important; }'
+- type: custom:mushroom-light-card
+  entity: light.eheim_3e_eclairage_canal_2
+  name: Canal 2
+  icon: mdi:led-strip-variant
+  show_brightness_control: true
+  use_light_color: false
+  collapsible_controls: false
+  tap_action:
+    action: more-info
+  card_mod:
+    style: 'ha-card { border-top: none !important; border-bottom: none !important; border-radius: 0 !important; margin-top: 0 !important; }'
+- type: entities
+  state_color: true
+  card_mod:
+    style: 'ha-card { border-top: none !important; border-top-left-radius: 0 !important; border-top-right-radius: 0 !important; margin-top: 0 !important; }'
+  entities:
+  - entity: time.eheim_3e_lever_heure_de_debut
+    name: 'Lever : début'
+  - entity: number.eheim_3e_lever_duree
+    name: 'Lever : durée'
+  - entity: time.eheim_3e_coucher_heure_de_debut
+    name: 'Coucher : début'
+  - entity: number.eheim_3e_coucher_duree
+    name: 'Coucher : durée'
+  - entity: number.eheim_3e_intensite_maximale_canal_1
+    name: Intensité max canal 1
+  - entity: number.eheim_3e_intensite_maximale_canal_2
+    name: Intensité max canal 2
+  - entity: number.eheim_3e_canal_2_avance_au_lever_retard_au_coucher
+    name: Décalage canal 2
+  - entity: switch.eheim_3e_retour_auto_au_prochain_lever_coucher
+    name: Retour auto au prochain lever/coucher

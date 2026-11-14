@@ -1,0 +1,312 @@
+# Cartes Lovelace (Mushroom + card-mod requis, installables via HACS).
+# Tableau de bord -> Modifier -> Ajouter une carte -> Manuel, puis coller l'une des cartes.
+# Les noms d'entités supposent un appareil ESPHome nommé « eheim-3e ».
+# Carte du filtre : nécessite aussi les scripts de scripts.yaml
+type: vertical-stack
+card_mod:
+  style: '#root { gap: 0 !important; }'
+cards:
+- type: custom:mushroom-template-card
+  entity: sensor.eheim_3e_debit_mesure
+  primary: Filtre Eheim 3e
+  secondary: '{% if not is_state(''binary_sensor.eheim_3e_pompe_connectee'',''on'') %}Pompe non connectée{% else %}{{ states(''sensor.eheim_3e_debit_mesure'') | int(0) }} L/h mesurés · {% set m = states(''select.eheim_3e_mode_pompe'') %}{{ m if m not in [''unknown'',''unavailable''] else states(''sensor.eheim_3e_mode'') }}{% endif %}'
+  icon: mdi:air-filter
+  icon_color: '{% if not is_state(''binary_sensor.eheim_3e_pompe_connectee'',''on'') %}disabled{% elif is_state(''binary_sensor.eheim_3e_erreur_rotor'',''on'') or is_state(''binary_sensor.eheim_3e_erreur_air'',''on'') or is_state(''binary_sensor.eheim_3e_erreur_temperature'',''on'') %}red{% elif is_state(''binary_sensor.eheim_3e_debit_faible'',''on'') or is_state(''binary_sensor.eheim_3e_consigne_non_atteinte'',''on'') %}orange{% else %}teal{% endif %}'
+  badge_icon: '{% if is_state(''binary_sensor.eheim_3e_erreur_rotor'',''on'') %}mdi:fan-alert{% elif is_state(''binary_sensor.eheim_3e_erreur_air'',''on'') %}mdi:weather-windy{% elif is_state(''binary_sensor.eheim_3e_erreur_temperature'',''on'') %}mdi:thermometer-alert{% elif is_state(''binary_sensor.eheim_3e_debit_faible'',''on'') %}mdi:water-alert{% elif is_state(''binary_sensor.eheim_3e_pompe_en_marche'',''on'') %}mdi:check{% endif %}'
+  badge_color: '{% if is_state(''binary_sensor.eheim_3e_erreur_rotor'',''on'') or is_state(''binary_sensor.eheim_3e_erreur_air'',''on'') or is_state(''binary_sensor.eheim_3e_erreur_temperature'',''on'') or is_state(''binary_sensor.eheim_3e_debit_faible'',''on'') %}red{% else %}green{% endif %}'
+  tap_action:
+    action: more-info
+    entity: sensor.eheim_3e_debit_mesure
+  hold_action:
+    action: more-info
+    entity: select.eheim_3e_mode_pompe
+  card_mod:
+    style: 'ha-card { padding: 8px 12px 4px !important; border-bottom: none !important; border-bottom-left-radius: 0 !important; border-bottom-right-radius: 0 !important; }'
+- type: custom:mushroom-chips-card
+  alignment: justify
+  chips:
+  - type: template
+    entity: sensor.eheim_3e_debit_relatif
+    icon: mdi:gauge
+    icon_color: teal
+    content: '{{ states(''sensor.eheim_3e_debit_relatif'') | int(0) }} %'
+    tap_action:
+      action: more-info
+  - type: template
+    entity: sensor.eheim_3e_vitesse_rotor
+    icon: mdi:fan
+    icon_color: cyan
+    content: '{{ states(''sensor.eheim_3e_vitesse_rotor'') | int(0) }} tr/min'
+    tap_action:
+      action: more-info
+  - type: template
+    entity: sensor.eheim_3e_debit_de_consigne
+    icon: mdi:target
+    icon_color: blue
+    content: '{{ states(''sensor.eheim_3e_debit_de_consigne'') | int(0) }} L/h'
+    tap_action:
+      action: more-info
+  - type: template
+    entity: sensor.eheim_3e_encrassement_compteur
+    icon: mdi:filter-variant
+    icon_color: '{% set p = states(''sensor.eheim_3e_encrassement_compteur'') | int(0) %}{{ ''red'' if p > 85 else (''orange'' if p > 60 else ''green'') }}'
+    content: '{{ states(''sensor.eheim_3e_encrassement_compteur'') | int(0) }} %'
+    tap_action:
+      action: more-info
+  card_mod:
+    style: "ha-card {\n --chip-height: 32px; --chip-font-size: 12px; --chip-spacing: 4px; \n background: var(--ha-card-background, var(--card-background-color)) !important;\n border: var(--ha-card-border-width, 1px) solid var(--ha-card-border-color, var(--divider-color)) !important;\n border-top: none !important; border-bottom: none !important; border-radius: 0 !important;\n padding: 2px 8px 6px !important; margin-top: 0 !important;\n}"
+- type: custom:mushroom-chips-card
+  alignment: justify
+  chips:
+  - type: template
+    icon: mdi:speedometer-medium
+    content: Constant
+    icon_color: '{{ ''blue'' if is_state(''sensor.eheim_3e_mode'',''Flux constant'') else ''disabled'' }}'
+    tap_action:
+      action: perform-action
+      perform_action: select.select_option
+      target:
+        entity_id: select.eheim_3e_mode_pompe
+      data:
+        option: Flux constant
+    hold_action:
+      action: more-info
+      entity: select.eheim_3e_mode_pompe
+  - type: template
+    icon: mdi:theme-light-dark
+    content: Bio
+    icon_color: '{{ ''green'' if is_state(''sensor.eheim_3e_mode'',''Bio 12 h'') else ''disabled'' }}'
+    tap_action:
+      action: perform-action
+      perform_action: select.select_option
+      target:
+        entity_id: select.eheim_3e_mode_pompe
+      data:
+        option: Bio 12 h
+    hold_action:
+      action: more-info
+      entity: select.eheim_3e_mode_pompe
+  - type: template
+    icon: mdi:waves
+    content: Stream
+    icon_color: '{{ ''cyan'' if is_state(''sensor.eheim_3e_mode'',''Stream'') else ''disabled'' }}'
+    tap_action:
+      action: perform-action
+      perform_action: select.select_option
+      target:
+        entity_id: select.eheim_3e_mode_pompe
+      data:
+        option: Stream
+    hold_action:
+      action: more-info
+      entity: select.eheim_3e_mode_pompe
+  - type: template
+    icon: mdi:hand-back-right
+    content: Manuel
+    icon_color: '{{ ''purple'' if is_state(''sensor.eheim_3e_mode'',''Manuel'') else ''disabled'' }}'
+    tap_action:
+      action: perform-action
+      perform_action: select.select_option
+      target:
+        entity_id: select.eheim_3e_mode_pompe
+      data:
+        option: Manuel
+    hold_action:
+      action: more-info
+      entity: select.eheim_3e_mode_pompe
+  card_mod:
+    style: "ha-card {\n --chip-height: 32px; --chip-font-size: 12px; --chip-spacing: 4px; \n background: var(--ha-card-background, var(--card-background-color)) !important;\n border: var(--ha-card-border-width, 1px) solid var(--ha-card-border-color, var(--divider-color)) !important;\n border-top: none !important; border-bottom: none !important; border-radius: 0 !important;\n padding: 4px 8px 4px !important; margin-top: 0 !important;\n}"
+- type: conditional
+  conditions:
+  - condition: state
+    entity: sensor.eheim_3e_mode
+    state_not:
+    - Bio 12 h
+    - Stream
+    - Manuel
+  card:
+    type: custom:mushroom-chips-card
+    alignment: justify
+    chips:
+    - type: template
+      icon: mdi:minus
+      icon_color: blue
+      tap_action:
+        action: perform-action
+        perform_action: script.turn_on
+        target:
+          entity_id: script.eheim_palier_moins
+    - type: template
+      entity: number.eheim_3e_palier_debit_flux_constant
+      icon: mdi:tune-vertical
+      icon_color: blue
+      content: Palier {{ states('number.eheim_3e_palier_debit_flux_constant') | int(0) }} · {{ states('sensor.eheim_3e_debit_de_consigne') | int(0) }} L/h
+      tap_action:
+        action: more-info
+    - type: template
+      icon: mdi:plus
+      icon_color: blue
+      tap_action:
+        action: perform-action
+        perform_action: script.turn_on
+        target:
+          entity_id: script.eheim_palier_plus
+    card_mod:
+      style: "ha-card {\n --chip-height: 32px; --chip-font-size: 12px; --chip-spacing: 4px; \n background: var(--ha-card-background, var(--card-background-color)) !important;\n border: var(--ha-card-border-width, 1px) solid var(--ha-card-border-color, var(--divider-color)) !important;\n border-top: none !important; border-bottom: none !important; border-radius: 0 !important;\n padding: 2px 8px 6px !important; margin-top: 0 !important;\n}"
+- type: conditional
+  conditions:
+  - condition: state
+    entity: sensor.eheim_3e_mode
+    state:
+    - Manuel
+  card:
+    type: custom:mushroom-chips-card
+    alignment: justify
+    chips:
+    - type: template
+      icon: mdi:minus
+      icon_color: purple
+      tap_action:
+        action: perform-action
+        perform_action: button.press
+        target:
+          entity_id: button.eheim_3e_manuel_debit_moins
+    - type: template
+      icon: mdi:hand-back-right
+      icon_color: purple
+      content: Manuel · {{ states('sensor.eheim_3e_vitesse_rotor') | int(0) }} tr/min
+    - type: template
+      icon: mdi:plus
+      icon_color: purple
+      tap_action:
+        action: perform-action
+        perform_action: button.press
+        target:
+          entity_id: button.eheim_3e_manuel_debit_plus
+    card_mod:
+      style: "ha-card {\n --chip-height: 32px; --chip-font-size: 12px; --chip-spacing: 4px; \n background: var(--ha-card-background, var(--card-background-color)) !important;\n border: var(--ha-card-border-width, 1px) solid var(--ha-card-border-color, var(--divider-color)) !important;\n border-top: none !important; border-bottom: none !important; border-radius: 0 !important;\n padding: 2px 8px 6px !important; margin-top: 0 !important;\n}"
+- type: conditional
+  conditions:
+  - condition: state
+    entity: sensor.eheim_3e_mode
+    state:
+    - Bio 12 h
+  card:
+    type: vertical-stack
+    card_mod:
+      style: '#root { gap: 0 !important; }'
+    cards:
+    - type: custom:mushroom-template-card
+      primary: Programme Bio
+      icon: mdi:theme-light-dark
+      icon_color: green
+      secondary: Pris en compte en appuyant sur « Appliquer »
+      card_mod:
+        style: 'ha-card { border-top: none !important; border-bottom: none !important; border-radius: 0 !important; margin-top: 0 !important; box-shadow: none !important; } ha-card { padding: 6px 12px 0 !important; --card-primary-font-size: 13px; --card-secondary-font-size: 11px; --icon-size: 30px; }'
+    - type: entities
+      state_color: true
+      entities:
+      - entity: time.eheim_3e_bio_debut_des_12_premieres_heures
+        name: Début
+        icon: mdi:clock-start
+      - entity: number.eheim_3e_bio_palier_12_premieres_heures
+        name: Palier 12 premières heures
+        icon: mdi:weather-sunny
+      - entity: number.eheim_3e_bio_palier_12_heures_suivantes
+        name: Palier 12 heures suivantes
+        icon: mdi:weather-night
+      card_mod:
+        style: 'ha-card { border-top: none !important; border-bottom: none !important; border-radius: 0 !important; margin-top: 0 !important; box-shadow: none !important; } .card-content { padding: 0 12px 4px !important; } '
+    - type: custom:mushroom-chips-card
+      alignment: center
+      chips:
+      - type: template
+        icon: mdi:check-circle-outline
+        icon_color: green
+        content: Appliquer les réglages
+        tap_action:
+          action: perform-action
+          perform_action: select.select_option
+          target:
+            entity_id: select.eheim_3e_mode_pompe
+          data:
+            option: Bio 12 h
+      card_mod:
+        style: "ha-card {\n --chip-height: 32px; --chip-font-size: 12px; --chip-spacing: 4px; \n background: var(--ha-card-background, var(--card-background-color)) !important;\n border: var(--ha-card-border-width, 1px) solid var(--ha-card-border-color, var(--divider-color)) !important;\n border-top: none !important; border-bottom: none !important; border-radius: 0 !important;\n padding: 2px 8px 6px !important; margin-top: 0 !important;\n}"
+- type: conditional
+  conditions:
+  - condition: state
+    entity: sensor.eheim_3e_mode
+    state:
+    - Stream
+  card:
+    type: vertical-stack
+    card_mod:
+      style: '#root { gap: 0 !important; }'
+    cards:
+    - type: custom:mushroom-template-card
+      primary: Programme Stream
+      icon: mdi:waves
+      icon_color: cyan
+      secondary: Pris en compte en appuyant sur « Appliquer »
+      card_mod:
+        style: 'ha-card { border-top: none !important; border-bottom: none !important; border-radius: 0 !important; margin-top: 0 !important; box-shadow: none !important; } ha-card { padding: 6px 12px 0 !important; --card-primary-font-size: 13px; --card-secondary-font-size: 11px; --icon-size: 30px; }'
+    - type: entities
+      state_color: true
+      entities:
+      - entity: number.eheim_3e_stream_palier_haut
+        name: Palier haut
+        icon: mdi:arrow-up-bold-outline
+      - entity: number.eheim_3e_stream_duree_phase_haute
+        name: Durée phase haute
+        icon: mdi:timer-sand
+      - entity: number.eheim_3e_stream_palier_bas
+        name: Palier bas
+        icon: mdi:arrow-down-bold-outline
+      - entity: number.eheim_3e_stream_duree_phase_basse
+        name: Durée phase basse
+        icon: mdi:timer-sand-complete
+      card_mod:
+        style: 'ha-card { border-top: none !important; border-bottom: none !important; border-radius: 0 !important; margin-top: 0 !important; box-shadow: none !important; } .card-content { padding: 0 12px 4px !important; } '
+    - type: custom:mushroom-chips-card
+      alignment: center
+      chips:
+      - type: template
+        icon: mdi:check-circle-outline
+        icon_color: green
+        content: Appliquer les réglages
+        tap_action:
+          action: perform-action
+          perform_action: select.select_option
+          target:
+            entity_id: select.eheim_3e_mode_pompe
+          data:
+            option: Stream
+      card_mod:
+        style: "ha-card {\n --chip-height: 32px; --chip-font-size: 12px; --chip-spacing: 4px; \n background: var(--ha-card-background, var(--card-background-color)) !important;\n border: var(--ha-card-border-width, 1px) solid var(--ha-card-border-color, var(--divider-color)) !important;\n border-top: none !important; border-bottom: none !important; border-radius: 0 !important;\n padding: 2px 8px 6px !important; margin-top: 0 !important;\n}"
+- type: custom:mushroom-chips-card
+  alignment: justify
+  chips:
+  - type: template
+    entity: sensor.eheim_3e_heures_avant_entretien
+    icon: mdi:wrench-clock
+    icon_color: '{% set hh = states(''sensor.eheim_3e_heures_avant_entretien'') | int(9999) %}{{ ''red'' if hh < 72 else (''orange'' if hh < 336 else ''grey'') }}'
+    content: '{% set d = states(''sensor.eheim_3e_prochain_entretien'') %}{% if d not in [''unknown'',''unavailable'',''''] %}Entretien {{ as_timestamp(d) | timestamp_custom(''%d/%m'') }}{% else %}Entretien —{% endif %}'
+    tap_action:
+      action: more-info
+  - type: template
+    entity: sensor.eheim_3e_temps_de_fonctionnement
+    icon: mdi:timer-outline
+    icon_color: grey
+    content: '{{ states(''sensor.eheim_3e_temps_de_fonctionnement'') | int(0) }} h'
+    tap_action:
+      action: more-info
+  - type: template
+    entity: sensor.eheim_3e_signal_wi_fi
+    icon: mdi:wifi
+    icon_color: '{% set s = states(''sensor.eheim_3e_signal_wi_fi'') | int(-100) %}{{ ''green'' if s > -65 else (''orange'' if s > -80 else ''red'') }}'
+    content: '{{ states(''sensor.eheim_3e_signal_wi_fi'') | int(0) }} dBm'
+    tap_action:
+      action: more-info
+  card_mod:
+    style: "ha-card {\n --chip-height: 32px; --chip-font-size: 12px; --chip-spacing: 4px; \n background: var(--ha-card-background, var(--card-background-color)) !important;\n border: var(--ha-card-border-width, 1px) solid var(--ha-card-border-color, var(--divider-color)) !important;\n border-top: none !important;\n border-radius: 0 0 var(--ha-card-border-radius, 12px) var(--ha-card-border-radius, 12px) !important;\n padding: 2px 8px 8px !important; margin-top: 0 !important;\n}"

@@ -1,0 +1,708 @@
+# EHEIM professionel 3e + éclairage LED (LDD-1000H sur carte Coralux)
+# ESP32-S3 (N16R8), ESPHome. Fichiers : ce YAML + eheim3e.h dans le même dossier ESPHome.
+#
+# Filtre    : GPIO17 -> TXD, GPIO18 -> RXD (module XY-K485), A+ / B- / terre -> jack de la pompe
+# Éclairage : GPIO4 -> entrée 1, GPIO6 -> entrée 2 de la carte Coralux, GND -> G
+# Horloge   : DS3231, SDA = GPIO8, SCL = GPIO9
+# Bouton    : GPIO5 <-> GND (Auto -> Forcé allumé -> Forcé éteint)
+
+esphome:
+  name: eheim-3e
+  friendly_name: Eheim 3e
+  includes:
+    - eheim3e.h
+  on_boot:
+    - priority: 600
+      then:
+        - ds1307.read_time:            # reprend l'heure de la pile RTC, sans réseau
+            id: rtc_time
+
+esp32:
+  board: esp32-s3-devkitc-1
+  flash_size: 16MB
+  framework:
+    type: esp-idf
+
+psram:
+  mode: octal
+  speed: 80MHz
+
+logger:
+  level: INFO    # DEBUG pour le diagnostic
+
+api:
+  encryption:
+    key: !secret api_key
+
+ota:
+  - platform: esphome
+    password: !secret ota_password
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  ap:
+    ssid: "Eheim-3e Fallback"
+
+captive_portal:
+
+# Page de réglage sur l'ESP32 lui-même : http://eheim-3e.local (ou son adresse IP)
+# Fonctionne sans Home Assistant.
+web_server:
+  port: 80
+  version: 3
+  auth:
+    type: digest
+    username: admin
+    password: !secret web_password
+
+uart:
+  id: pump_uart
+  tx_pin: GPIO17
+  rx_pin: GPIO18
+  baud_rate: 115200
+  data_bits: 8
+  parity: NONE
+  stop_bits: 1
+  rx_buffer_size: 512
+
+globals:
+  - id: pump_type
+    type: int
+    initial_value: "2076"
+  - id: boot_stage        # 0 = lire firmware, 1 = lire type, 2 = fonctionnement normal
+    type: int
+    initial_value: "0"
+  - id: last_mode         # dernier mot de mode lu
+    type: int
+    initial_value: "0"
+  - id: last_step         # dernier palier lu
+    type: int
+    initial_value: "-1"
+  - id: tick
+    type: int
+    initial_value: "0"
+  - id: last_ok
+    type: uint32_t
+    initial_value: "0"
+
+# ---------------------------------------------------------------- interrogation
+interval:
+  # Éclairage : recalculé toutes les 30 s à partir de l'heure locale, même après un redémarrage
+  - interval: 30s
+    then:
+      - lambda: |-
+          // Retour automatique au début du prochain lever ou coucher
+          if (id(mode_eclairage).active_index().value_or(0) != 0 && id(retour_auto).state) {
+            auto now = id(sys_time).now();
+            if (now.is_valid() && now.second < 30 &&
+                ((now.hour == id(lever_heure).hour && now.minute == id(lever_heure).minute) ||
+                 (now.hour == id(coucher_heure).hour && now.minute == id(coucher_heure).minute))) {
+              id(mode_eclairage).make_call().set_index(0).perform();
+            }
+          }
+      - script.execute: appliquer_eclairage
+  # Pompe : toutes les 250 ms, envoie la prochaine commande en attente,
+  # sinon une lecture des données toutes les 5 s
+  - interval: 250ms
+    then:
+      - lambda: |-
+          auto *u = id(pump_uart);
+          id(tick)++;
+          if (!eheim::queue.empty()) {
+            auto c = eheim::queue.front();
+            eheim::queue.pop_front();
+            ESP_LOGI("eheim", "Envoi commande 0x%02X", c.cmd);
+            eheim::send_frame(u, c.cmd, c.data, c.len);
+            id(tick) = 16;                         // prochaine lecture dans ~1 s
+            return;
+          }
+          if (id(tick) < 20) return;
+          id(tick) = 0;
+          if (id(boot_stage) == 0) {
+            eheim::send(u, eheim::DEV_BCAST, eheim::CMD_GET_DEVICEID);
+            id(boot_stage) = 1;
+          } else if (id(boot_stage) == 1) {
+            eheim::send(u, eheim::DEV_PUMP, eheim::CMD_GET_PUMPVERSION);
+            id(boot_stage) = 2;
+          } else {
+            eheim::send(u, eheim::DEV_PUMP, eheim::CMD_GET_ACTUALDATA);
+          }
+  # Lecture des réponses, décalée de 125 ms par rapport aux envois
+  - interval: 125ms
+    then:
+      - script.execute: parse_frames
+
+script:
+  - id: appliquer_eclairage
+    mode: restart
+    then:
+      - lambda: |-
+          size_t mode = id(mode_eclairage).active_index().value_or(0);  // 0 auto, 1 allumé, 2 éteint
+          float max1 = id(intensite_max1).state / 100.0f;
+          float max2 = id(intensite_max2).state / 100.0f;
+
+          // Applique un niveau (0..1) à une lumière avec une transition en ms
+          auto appliquer = [](light::LightState *l, float b, uint32_t ms) {
+            auto call = l->make_call();
+            call.set_transition_length(ms);
+            if (b < 0.002f) {
+              if (l->current_values.is_on()) { call.set_state(false); call.perform(); }
+            } else {
+              call.set_state(true);
+              call.set_brightness(b);
+              call.perform();
+            }
+          };
+
+          if (mode == 1) { appliquer(id(eclairage1), max1, 3000); appliquer(id(eclairage2), max2, 3000); return; }
+          if (mode == 2) { appliquer(id(eclairage1), 0, 3000);    appliquer(id(eclairage2), 0, 3000);    return; }
+
+          // Automatique : courbe lever / plein jour / coucher / nuit
+          auto now = id(sys_time).now();
+          if (!now.is_valid()) return;               // pas encore d'heure : on ne touche à rien
+          float t = now.hour * 60 + now.minute + now.second / 60.0f;
+          float l0 = id(lever_heure).hour * 60 + id(lever_heure).minute, ld = id(lever_duree).state;
+          float c0 = id(coucher_heure).hour * 60 + id(coucher_heure).minute, cd = id(coucher_duree).state;
+
+          auto courbe = [&](float lever, float coucher) {
+            float b;
+            if (t < lever) b = 0;
+            else if (t < lever + ld) b = (t - lever) / ld;
+            else if (t < coucher) b = 1;
+            else if (t < coucher + cd) b = 1 - (t - coucher) / cd;
+            else b = 0;
+            return b * b * (3 - 2 * b);              // courbe douce
+          };
+
+          float dec = id(decalage2).state;           // canal 2 : s'allume plus tôt et s'éteint plus tard
+          appliquer(id(eclairage1), courbe(l0, c0) * max1, 30000);
+          appliquer(id(eclairage2), courbe(l0 - dec, c0 + dec) * max2, 30000);
+
+  - id: parse_frames
+    then:
+      - lambda: |-
+          auto frames = eheim::read_frames(id(pump_uart));
+          for (auto &f : frames) {
+            uint8_t cmd = f[3];
+
+            if (cmd == 0x10 && f.size() >= 55) {
+              eheim::Data d;
+              memcpy(&d, f.data() + 4, sizeof(d));
+              id(last_ok) = millis();
+
+              int consigne = eheim::flow_lh(id(pump_type), d.soll_step);
+              int mesure = d.dfs * 60 / 100;
+              int since_h = d.actual_time / 60;
+              int total = since_h + d.wartung_hours;
+
+              id(debit_consigne).publish_state(consigne);
+              id(debit_mesure).publish_state(mesure);
+              if (consigne > 0) id(debit_relatif).publish_state(100.0f * mesure / consigne);
+              id(vitesse_rotor).publish_state(d.frequenz / 100 * 60);
+              id(palier).publish_state(d.soll_step);
+              if (eheim::queue.empty()) id(palier_reglage).publish_state(d.soll_step);
+              id(last_step) = d.soll_step;
+              id(last_mode) = d.pumpe_mode;
+              id(heures_fonctionnement).publish_state(d.run_time / 60);
+              id(heures_depuis_entretien).publish_state(since_h);
+              id(heures_avant_entretien).publish_state(d.wartung_hours);
+              auto now = id(sys_time).now();
+              if (now.is_valid()) {
+                time_t t = now.timestamp + (time_t) d.wartung_hours * 3600;
+                char buf[16];
+                strftime(buf, sizeof(buf), "%Y-%m-%d", localtime(&t));
+                if (id(prochain_entretien).state != buf) id(prochain_entretien).publish_state(buf);
+              }
+              if (total > 0) id(encrassement).publish_state(since_h * 100 / total);
+              id(courant_brut).publish_state(d.current);
+              id(mode_brut).publish_state(d.pumpe_mode);
+
+              uint16_t m = (uint16_t) d.pumpe_mode;
+              id(pompe_en_marche).publish_state(d.pumpe_on != 0);
+              id(erreur_rotor).publish_state(m & eheim::PM_ROTOR_ERR);
+              id(erreur_air).publish_state(m & eheim::PM_AIR_ERR);
+              id(erreur_temperature).publish_state(m & eheim::PM_TEMP_ERR);
+              id(consigne_non_atteinte).publish_state(m & 0x0002);
+
+              std::string mode;
+              if (m & 0x0010) mode = "Manuel";
+              else if (m & 0x0008) mode = "Stream (pulsé)";
+              else if (m & 0x0004) mode = "Bio 12 h";
+              else if (m & 0x0001) mode = "Flux constant";
+              else mode = "Inconnu";
+              if (m & (eheim::PM_ROTOR_ERR | eheim::PM_AIR_ERR | eheim::PM_TEMP_ERR)) mode += " (erreur)";
+              if (id(mode_pompe).state != mode) id(mode_pompe).publish_state(mode);
+              if (eheim::queue.empty()) {
+                const char *opt = (m & 0x0010) ? "Manuel" : (m & 0x0008) ? "Stream" : (m & 0x0004) ? "Bio 12 h" : "Flux constant";
+                id(mode_pompe_choix).publish_state(opt);
+              }
+
+            } else if (cmd == 0x90 && f.size() >= 5 && f[4] != eheim::CMD_GET_PUMPVERSION) {
+              ESP_LOGI("eheim", "Commande 0x%02X acceptée par la pompe", f[4]);
+
+            } else if (cmd == 0x90 && f.size() >= 6 && f[4] == eheim::CMD_GET_PUMPVERSION) {
+              id(pump_type) = 2000 + f[5];
+              id(type_pompe).publish_state(to_string(id(pump_type)));
+
+            } else if (cmd == 0xFF && f.size() >= 6) {
+              char buf[12];
+              snprintf(buf, sizeof(buf), "%u.%02u", f[4], f[5]);
+              id(firmware).publish_state(buf);
+            }
+          }
+
+# ---------------------------------------------------------------- capteurs
+sensor:
+  - platform: template
+    id: debit_consigne
+    name: "Débit de consigne"
+    unit_of_measurement: "L/h"
+    icon: mdi:target
+    accuracy_decimals: 0
+    update_interval: never
+  - platform: template
+    id: debit_mesure
+    name: "Débit mesuré"
+    unit_of_measurement: "L/h"
+    icon: mdi:water-pump
+    state_class: measurement
+    accuracy_decimals: 0
+    update_interval: never
+  - platform: template
+    id: debit_relatif
+    name: "Débit relatif"
+    unit_of_measurement: "%"
+    icon: mdi:gauge
+    state_class: measurement
+    accuracy_decimals: 0
+    update_interval: never
+  - platform: template
+    id: vitesse_rotor
+    name: "Vitesse rotor"
+    unit_of_measurement: "tr/min"
+    icon: mdi:rotate-right
+    state_class: measurement
+    accuracy_decimals: 0
+    update_interval: never
+  - platform: template
+    id: palier
+    name: "Palier actuel"
+    icon: mdi:stairs
+    accuracy_decimals: 0
+    update_interval: never
+  - platform: template
+    id: heures_fonctionnement
+    name: "Temps de fonctionnement"
+    unit_of_measurement: "h"
+    icon: mdi:timer-outline
+    state_class: total_increasing
+    accuracy_decimals: 0
+    update_interval: never
+  - platform: template
+    id: heures_depuis_entretien
+    name: "Heures depuis entretien"
+    unit_of_measurement: "h"
+    icon: mdi:wrench-clock
+    accuracy_decimals: 0
+    update_interval: never
+  - platform: template
+    id: heures_avant_entretien
+    name: "Heures avant entretien"
+    unit_of_measurement: "h"
+    icon: mdi:calendar-clock
+    accuracy_decimals: 0
+    update_interval: never
+  - platform: template
+    id: encrassement
+    name: "Encrassement (compteur)"
+    unit_of_measurement: "%"
+    icon: mdi:filter-outline
+    accuracy_decimals: 0
+    update_interval: never
+  - platform: template
+    id: courant_brut
+    name: "Courant (brut)"
+    icon: mdi:current-ac
+    entity_category: diagnostic
+    accuracy_decimals: 0
+    update_interval: never
+  - platform: template
+    id: mode_brut
+    name: "Mode (bits bruts)"
+    icon: mdi:code-brackets
+    entity_category: diagnostic
+    accuracy_decimals: 0
+    update_interval: never
+  - platform: wifi_signal
+    name: "Signal Wi-Fi"
+    update_interval: 60s
+
+binary_sensor:
+  # Bouton poussoir facultatif entre GPIO5 et GND : chaque appui fait
+  # Automatique -> Forcé allumé -> Forcé éteint -> Automatique
+  - platform: gpio
+    id: bouton_eclairage
+    name: "Bouton éclairage"
+    pin:
+      number: GPIO5
+      mode: INPUT_PULLUP
+      inverted: true
+    filters:
+      - delayed_on: 30ms
+      - delayed_off: 30ms
+    on_press:
+      then:
+        - lambda: |-
+            size_t m = id(mode_eclairage).active_index().value_or(0);
+            id(mode_eclairage).make_call().set_index((m + 1) % 3).perform();
+  - platform: template
+    id: pompe_en_marche
+    name: "Pompe en marche"
+    device_class: running
+  - platform: template
+    id: erreur_rotor
+    name: "Erreur rotor"
+    device_class: problem
+  - platform: template
+    id: erreur_air
+    name: "Erreur air"
+    device_class: problem
+  - platform: template
+    id: erreur_temperature
+    name: "Erreur température"
+    device_class: problem
+  - platform: template
+    id: consigne_non_atteinte
+    name: "Consigne non atteinte"
+    device_class: problem
+    filters:
+      - delayed_on: 5min
+  - platform: template
+    name: "Débit faible"
+    device_class: problem
+    lambda: |-
+      if (!id(debit_relatif).has_state()) return {};
+      return id(debit_relatif).state < 70.0f;
+    filters:
+      - delayed_on: 10min
+      - delayed_off: 1min
+  - platform: template
+    name: "Pompe connectée"
+    device_class: connectivity
+    entity_category: diagnostic
+    lambda: |-
+      return id(last_ok) != 0 && (millis() - id(last_ok)) < 30000;
+
+# Heure 100 % autonome : NTP (internet) + module RTC DS3231 à pile.
+# Home Assistant n'est pas nécessaire. Sans internet, la pile RTC garde l'heure.
+time:
+  - platform: sntp
+    id: sys_time
+    timezone: Europe/Paris
+    servers:
+      - 0.pool.ntp.org
+      - 1.pool.ntp.org
+      - time.google.com
+    on_time_sync:
+      then:
+        - ds1307.write_time:           # met la pile RTC à l'heure
+            id: rtc_time
+  - platform: ds1307                   # compatible DS3231
+    id: rtc_time
+    timezone: Europe/Paris
+    update_interval: never
+
+i2c:
+  sda: GPIO8
+  scl: GPIO9
+
+# ---------------------------------------------------------------- éclairage LDD-1000H
+# Carte Coralux : GPIO4 -> entrée 1, GPIO6 -> entrée 2, GND ESP32 -> G
+# (les résistances de 10 kΩ sont déjà sur la carte)
+output:
+  - platform: ledc
+    id: ldd_pwm1
+    pin: GPIO4
+    frequency: 1000Hz      # LDD-H : 100 Hz à 1 kHz
+  - platform: ledc
+    id: ldd_pwm2
+    pin: GPIO6
+    frequency: 1000Hz
+
+light:
+  - platform: monochromatic
+    id: eclairage1
+    name: "Éclairage canal 1"
+    output: ldd_pwm1
+    gamma_correct: 2.2
+    default_transition_length: 2s
+    restore_mode: ALWAYS_OFF   # le cycle recalcule le bon niveau au démarrage
+  - platform: monochromatic
+    id: eclairage2
+    name: "Éclairage canal 2"
+    output: ldd_pwm2
+    gamma_correct: 2.2
+    default_transition_length: 2s
+    restore_mode: ALWAYS_OFF
+
+datetime:
+  - platform: template
+    id: bio_debut
+    name: "Bio : début des 12 premières heures"
+    type: time
+    optimistic: true
+    restore_value: true
+    initial_value: "00:00"
+  - platform: template
+    id: lever_heure
+    name: "Lever : heure de début"
+    type: time
+    optimistic: true
+    restore_value: true
+    initial_value: "10:00"
+  - platform: template
+    id: coucher_heure
+    name: "Coucher : heure de début"
+    type: time
+    optimistic: true
+    restore_value: true
+    initial_value: "20:00"
+
+select:
+  # Mode de la pompe : refléte l'état réel ; un choix envoie la séquence de ControlCenter
+  - platform: template
+    id: mode_pompe_choix
+    name: "Mode pompe"
+    icon: mdi:pump
+    options:
+      - "Flux constant"
+      - "Bio 12 h"
+      - "Stream"
+      - "Manuel"
+    set_action:
+      - lambda: |-
+          int step = id(last_step) >= 0 ? id(last_step) : (int) id(palier_reglage).state;
+          bool manuel = id(last_mode) & eheim::PM_MANUAL;
+          bool bio = id(last_mode) & eheim::PM_BIO;
+          if (x == "Flux constant") {
+            eheim::q_constant_flow(step);
+          } else if (x == "Bio 12 h") {
+            auto now = id(sys_time).now();
+            if (!now.is_valid()) { ESP_LOGW("eheim", "Heure inconnue : mode Bio non envoyé"); return; }
+            if (manuel) eheim::q_constant_flow(step);
+            eheim::q_pump_mode(eheim::PM_BIO);
+            eheim::q_bio((int) id(bio_palier_jour).state, (int) id(bio_palier_nuit).state,
+                         id(bio_debut).hour, id(bio_debut).minute, now.hour, now.minute);
+          } else if (x == "Stream") {
+            if (manuel || bio) eheim::q_constant_flow(step);
+            eheim::q_pump_mode(eheim::PM_PULSE);
+            eheim::q_pulse((int) id(stream_palier_haut).state, (int) id(stream_palier_bas).state,
+                           (int32_t) id(stream_duree_haut).state, (int32_t) id(stream_duree_bas).state);
+          } else if (x == "Manuel") {
+            eheim::q_constant_flow(0);
+            eheim::q_pump_mode(eheim::PM_MANUAL);
+            eheim::q_pump_mode(eheim::PM_MANUAL);
+          }
+          ESP_LOGI("eheim", "Changement de mode demandé : %s", x.c_str());
+  - platform: template
+    id: mode_eclairage
+    name: "Mode éclairage"
+    icon: mdi:lightbulb-auto
+    options:
+      - "Automatique"
+      - "Forcé allumé"
+      - "Forcé éteint"
+    initial_option: "Automatique"
+    optimistic: true
+    restore_value: true
+    on_value:
+      then:
+        - script.execute: appliquer_eclairage
+
+switch:
+  - platform: template
+    id: retour_auto
+    name: "Retour auto au prochain lever/coucher"
+    icon: mdi:restore
+    optimistic: true
+    restore_mode: RESTORE_DEFAULT_ON
+
+number:
+  - platform: template
+    id: lever_duree
+    name: "Lever : durée"
+    icon: mdi:timer-sand
+    unit_of_measurement: "min"
+    min_value: 1
+    max_value: 240
+    step: 1
+    initial_value: 60
+    optimistic: true
+    restore_value: true
+    mode: box
+  - platform: template
+    id: coucher_duree
+    name: "Coucher : durée"
+    icon: mdi:timer-sand
+    unit_of_measurement: "min"
+    min_value: 1
+    max_value: 240
+    step: 1
+    initial_value: 60
+    optimistic: true
+    restore_value: true
+    mode: box
+  - platform: template
+    id: intensite_max1
+    name: "Intensité maximale canal 1"
+    icon: mdi:brightness-percent
+    unit_of_measurement: "%"
+    min_value: 0
+    max_value: 100
+    step: 1
+    initial_value: 80
+    optimistic: true
+    restore_value: true
+    mode: slider
+  - platform: template
+    id: intensite_max2
+    name: "Intensité maximale canal 2"
+    icon: mdi:brightness-percent
+    unit_of_measurement: "%"
+    min_value: 0
+    max_value: 100
+    step: 1
+    initial_value: 80
+    optimistic: true
+    restore_value: true
+    mode: slider
+  - platform: template
+    id: decalage2
+    name: "Canal 2 : avance au lever / retard au coucher"
+    icon: mdi:clock-start
+    unit_of_measurement: "min"
+    min_value: -120
+    max_value: 120
+    step: 5
+    initial_value: 0
+    optimistic: true
+    restore_value: true
+    mode: box
+
+# ---------------------------------------------------------------- commande pompe
+  - platform: template
+    id: palier_reglage
+    name: "Palier débit (flux constant)"
+    icon: mdi:tune-vertical
+    min_value: 0
+    max_value: 14
+    step: 1
+    mode: slider
+    optimistic: true
+    set_action:
+      - lambda: |-
+          eheim::q_constant_flow((int) x);           // repasse aussi la pompe en flux constant
+          ESP_LOGI("eheim", "Flux constant, palier %d (%d L/h)", (int) x,
+                   eheim::flow_lh(id(pump_type), (int) x));
+
+  - platform: template
+    id: bio_palier_jour
+    name: "Bio : palier 12 premières heures"
+    icon: mdi:white-balance-sunny
+    min_value: 0
+    max_value: 14
+    step: 1
+    initial_value: 5
+    optimistic: true
+    restore_value: true
+    mode: slider
+  - platform: template
+    id: bio_palier_nuit
+    name: "Bio : palier 12 heures suivantes"
+    icon: mdi:weather-night
+    min_value: 0
+    max_value: 14
+    step: 1
+    initial_value: 14
+    optimistic: true
+    restore_value: true
+    mode: slider
+  - platform: template
+    id: stream_palier_haut
+    name: "Stream : palier haut"
+    icon: mdi:arrow-up-bold
+    min_value: 0
+    max_value: 14
+    step: 1
+    initial_value: 14
+    optimistic: true
+    restore_value: true
+    mode: slider
+  - platform: template
+    id: stream_palier_bas
+    name: "Stream : palier bas"
+    icon: mdi:arrow-down-bold
+    min_value: 0
+    max_value: 14
+    step: 1
+    initial_value: 5
+    optimistic: true
+    restore_value: true
+    mode: slider
+  - platform: template
+    id: stream_duree_haut
+    name: "Stream : durée phase haute"
+    icon: mdi:timer-outline
+    unit_of_measurement: "s"
+    min_value: 5
+    max_value: 100
+    step: 1
+    initial_value: 10
+    optimistic: true
+    restore_value: true
+    mode: box
+  - platform: template
+    id: stream_duree_bas
+    name: "Stream : durée phase basse"
+    icon: mdi:timer-outline
+    unit_of_measurement: "s"
+    min_value: 5
+    max_value: 100
+    step: 1
+    initial_value: 10
+    optimistic: true
+    restore_value: true
+    mode: box
+
+text_sensor:
+  - platform: template
+    id: prochain_entretien
+    name: "Prochain entretien"
+    icon: mdi:calendar-check
+  - platform: template
+    id: mode_pompe
+    name: "Mode"
+    icon: mdi:waves
+  - platform: template
+    id: firmware
+    name: "Firmware pompe"
+    entity_category: diagnostic
+  - platform: template
+    id: type_pompe
+    name: "Type de pompe"
+    entity_category: diagnostic
+
+button:
+  - platform: restart
+    name: "Redémarrer"
+  - platform: template
+    name: "Manuel : débit plus"
+    icon: mdi:plus
+    on_press:
+      - lambda: eheim::q_key(eheim::KEY_UP);
+  - platform: template
+    name: "Manuel : débit moins"
+    icon: mdi:minus
+    on_press:
+      - lambda: eheim::q_key(eheim::KEY_DOWN);

@@ -1,0 +1,22 @@
+# À ajouter dans scripts.yaml de Home Assistant : boutons − / + du palier en flux constant
+eheim_palier_plus:
+  alias: "Eheim : palier +"
+  icon: mdi:plus
+  mode: queued
+  sequence:
+    - action: number.set_value
+      target:
+        entity_id: number.eheim_3e_palier_debit_flux_constant
+      data:
+        value: "{{ [states('number.eheim_3e_palier_debit_flux_constant') | int(0) + 1, 14] | min }}"
+
+eheim_palier_moins:
+  alias: "Eheim : palier −"
+  icon: mdi:minus
+  mode: queued
+  sequence:
+    - action: number.set_value
+      target:
+        entity_id: number.eheim_3e_palier_debit_flux_constant
+      data:
+        value: "{{ [states('number.eheim_3e_palier_debit_flux_constant') | int(0) - 1, 0] | max }}"

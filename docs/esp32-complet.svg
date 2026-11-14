@@ -1,0 +1,93 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 660" width="1000" height="660" font-family="Segoe UI, Helvetica, Arial, sans-serif">
+<title>Câblage complet : filtre EHEIM, éclairage Coralux, DS3231 et bouton</title>
+<rect width="1000" height="660" rx="14" fill="#ffffff"/>
+<text x="500" y="38" text-anchor="middle" font-size="22" font-weight="600" fill="#222">ESP32-S3 : toutes les connexions</text>
+<text x="500" y="62" text-anchor="middle" font-size="14" fill="#666">rouge = 3V3 · noir = masse · couleur du module = signal</text>
+<rect x="400" y="100" width="200" height="500" rx="14" fill="#EEEDFE" stroke="#534AB7" stroke-width="2"/>
+<text x="500.0" y="128" text-anchor="middle" font-size="17" font-weight="600" fill="#3C3489">ESP32-S3</text>
+<text x="500.0" y="147" text-anchor="middle" font-size="12" fill="#534AB7">DevKit N16R8</text>
+<rect x="470" y="300" width="60" height="60" rx="4" fill="#fff" stroke="#AFA9EC"/><text x="500" y="335" text-anchor="middle" font-size="11" fill="#7F77DD">WROOM-1</text>
+<rect x="465" y="586" width="70" height="26" rx="8" fill="#444441"/><text x="500" y="604" text-anchor="middle" font-size="12" fill="#fff">USB-C</text>
+<path d="M 500 612 L 500 630" stroke="#444441" stroke-width="3"/><text x="500" y="648" text-anchor="middle" font-size="13" fill="#444441">Chargeur USB-C 5 V, 1 A</text>
+<rect x="70" y="110" width="200" height="210" rx="14" fill="#E6F1FB" stroke="#185FA5" stroke-width="2"/>
+<text x="170.0" y="138" text-anchor="middle" font-size="17" font-weight="600" fill="#0C447C">Horloge DS3231</text>
+<text x="170.0" y="157" text-anchor="middle" font-size="12" fill="#185FA5">I2C, pile CR2032</text>
+<rect x="70" y="418" width="200" height="142" rx="14" fill="#FAECE7" stroke="#993C1D" stroke-width="2"/>
+<text x="170.0" y="446" text-anchor="middle" font-size="17" font-weight="600" fill="#712B13">Bouton poussoir</text>
+<text x="170.0" y="465" text-anchor="middle" font-size="12" fill="#993C1D">Auto → Allumé → Éteint</text>
+<rect x="730" y="110" width="200" height="210" rx="14" fill="#E1F5EE" stroke="#0F6E56" stroke-width="2"/>
+<text x="830.0" y="138" text-anchor="middle" font-size="17" font-weight="600" fill="#085041">Module XY-K485</text>
+<text x="830.0" y="157" text-anchor="middle" font-size="12" fill="#0F6E56">vers le jack de la pompe</text>
+<rect x="730" y="370" width="200" height="230" rx="14" fill="#FAEEDA" stroke="#BA7517" stroke-width="2"/>
+<text x="830.0" y="398" text-anchor="middle" font-size="17" font-weight="600" fill="#854F0B">Carte Coralux</text>
+<text x="830.0" y="417" text-anchor="middle" font-size="12" fill="#BA7517">2 × LDD-1000H</text>
+<circle cx="270" cy="170" r="7" fill="#fff" stroke="#185FA5" stroke-width="2"/>
+<text x="254" y="175" text-anchor="end" font-size="14" font-weight="600" fill="#0C447C">VCC</text>
+<circle cx="400" cy="170" r="7" fill="#fff" stroke="#534AB7" stroke-width="2"/>
+<text x="416" y="175" font-size="14" font-weight="600" fill="#3C3489">3V3</text>
+<line x1="277" y1="170" x2="393" y2="170" stroke="#D0312D" stroke-width="3.5" stroke-linecap="round"/>
+<circle cx="270" cy="210" r="7" fill="#fff" stroke="#185FA5" stroke-width="2"/>
+<text x="254" y="215" text-anchor="end" font-size="14" font-weight="600" fill="#0C447C">GND</text>
+<circle cx="400" cy="210" r="7" fill="#fff" stroke="#534AB7" stroke-width="2"/>
+<text x="416" y="215" font-size="14" font-weight="600" fill="#3C3489">GND</text>
+<line x1="277" y1="210" x2="393" y2="210" stroke="#222222" stroke-width="3.5" stroke-linecap="round"/>
+<circle cx="270" cy="250" r="7" fill="#fff" stroke="#185FA5" stroke-width="2"/>
+<text x="254" y="255" text-anchor="end" font-size="14" font-weight="600" fill="#0C447C">SDA</text>
+<circle cx="400" cy="250" r="7" fill="#fff" stroke="#534AB7" stroke-width="2"/>
+<text x="416" y="255" font-size="14" font-weight="600" fill="#3C3489">GPIO8</text>
+<line x1="277" y1="250" x2="393" y2="250" stroke="#185FA5" stroke-width="3.5" stroke-linecap="round"/>
+<circle cx="270" cy="290" r="7" fill="#fff" stroke="#185FA5" stroke-width="2"/>
+<text x="254" y="295" text-anchor="end" font-size="14" font-weight="600" fill="#0C447C">SCL</text>
+<circle cx="400" cy="290" r="7" fill="#fff" stroke="#534AB7" stroke-width="2"/>
+<text x="416" y="295" font-size="14" font-weight="600" fill="#3C3489">GPIO9</text>
+<line x1="277" y1="290" x2="393" y2="290" stroke="#185FA5" stroke-width="3.5" stroke-linecap="round"/>
+<circle cx="270" cy="490" r="7" fill="#fff" stroke="#993C1D" stroke-width="2"/>
+<text x="254" y="495" text-anchor="end" font-size="14" font-weight="600" fill="#712B13">borne 1</text>
+<circle cx="400" cy="490" r="7" fill="#fff" stroke="#534AB7" stroke-width="2"/>
+<text x="416" y="495" font-size="14" font-weight="600" fill="#3C3489">GPIO5</text>
+<line x1="277" y1="490" x2="393" y2="490" stroke="#993C1D" stroke-width="3.5" stroke-linecap="round"/>
+<circle cx="270" cy="530" r="7" fill="#fff" stroke="#993C1D" stroke-width="2"/>
+<text x="254" y="535" text-anchor="end" font-size="14" font-weight="600" fill="#712B13">borne 2</text>
+<circle cx="400" cy="530" r="7" fill="#fff" stroke="#534AB7" stroke-width="2"/>
+<text x="416" y="535" font-size="14" font-weight="600" fill="#3C3489">GND</text>
+<line x1="277" y1="530" x2="393" y2="530" stroke="#222222" stroke-width="3.5" stroke-linecap="round"/>
+<circle cx="600" cy="170" r="7" fill="#fff" stroke="#534AB7" stroke-width="2"/>
+<text x="584" y="175" text-anchor="end" font-size="14" font-weight="600" fill="#3C3489">3V3</text>
+<circle cx="730" cy="170" r="7" fill="#fff" stroke="#0F6E56" stroke-width="2"/>
+<text x="746" y="175" font-size="14" font-weight="600" fill="#085041">VCC</text>
+<line x1="607" y1="170" x2="723" y2="170" stroke="#D0312D" stroke-width="3.5" stroke-linecap="round"/>
+<circle cx="600" cy="210" r="7" fill="#fff" stroke="#534AB7" stroke-width="2"/>
+<text x="584" y="215" text-anchor="end" font-size="14" font-weight="600" fill="#3C3489">GPIO17</text>
+<circle cx="730" cy="210" r="7" fill="#fff" stroke="#0F6E56" stroke-width="2"/>
+<text x="746" y="215" font-size="14" font-weight="600" fill="#085041">TXD</text>
+<line x1="607" y1="210" x2="723" y2="210" stroke="#0F6E56" stroke-width="3.5" stroke-linecap="round"/>
+<circle cx="600" cy="250" r="7" fill="#fff" stroke="#534AB7" stroke-width="2"/>
+<text x="584" y="255" text-anchor="end" font-size="14" font-weight="600" fill="#3C3489">GPIO18</text>
+<circle cx="730" cy="250" r="7" fill="#fff" stroke="#0F6E56" stroke-width="2"/>
+<text x="746" y="255" font-size="14" font-weight="600" fill="#085041">RXD</text>
+<line x1="607" y1="250" x2="723" y2="250" stroke="#0F6E56" stroke-width="3.5" stroke-linecap="round"/>
+<circle cx="600" cy="290" r="7" fill="#fff" stroke="#534AB7" stroke-width="2"/>
+<text x="584" y="295" text-anchor="end" font-size="14" font-weight="600" fill="#3C3489">GND</text>
+<circle cx="730" cy="290" r="7" fill="#fff" stroke="#0F6E56" stroke-width="2"/>
+<text x="746" y="295" font-size="14" font-weight="600" fill="#085041">GND</text>
+<line x1="607" y1="290" x2="723" y2="290" stroke="#222222" stroke-width="3.5" stroke-linecap="round"/>
+<circle cx="600" cy="430" r="7" fill="#fff" stroke="#534AB7" stroke-width="2"/>
+<text x="584" y="435" text-anchor="end" font-size="14" font-weight="600" fill="#3C3489">GPIO4</text>
+<circle cx="730" cy="430" r="7" fill="#fff" stroke="#BA7517" stroke-width="2"/>
+<text x="746" y="435" font-size="14" font-weight="600" fill="#854F0B">entrée 1</text>
+<line x1="607" y1="430" x2="723" y2="430" stroke="#BA7517" stroke-width="3.5" stroke-linecap="round"/>
+<circle cx="600" cy="470" r="7" fill="#fff" stroke="#534AB7" stroke-width="2"/>
+<text x="584" y="475" text-anchor="end" font-size="14" font-weight="600" fill="#3C3489">GPIO6</text>
+<circle cx="730" cy="470" r="7" fill="#fff" stroke="#BA7517" stroke-width="2"/>
+<text x="746" y="475" font-size="14" font-weight="600" fill="#854F0B">entrée 2</text>
+<line x1="607" y1="470" x2="723" y2="470" stroke="#BA7517" stroke-width="3.5" stroke-linecap="round"/>
+<circle cx="600" cy="510" r="7" fill="#fff" stroke="#534AB7" stroke-width="2"/>
+<text x="584" y="515" text-anchor="end" font-size="14" font-weight="600" fill="#3C3489">GND</text>
+<circle cx="730" cy="510" r="7" fill="#fff" stroke="#BA7517" stroke-width="2"/>
+<text x="746" y="515" font-size="14" font-weight="600" fill="#854F0B">G</text>
+<line x1="607" y1="510" x2="723" y2="510" stroke="#222222" stroke-width="3.5" stroke-linecap="round"/>
+<text x="830" y="550" text-anchor="middle" font-size="12" fill="#854F0B">alimentation LED séparée</text>
+<text x="830" y="567" text-anchor="middle" font-size="12" fill="#854F0B">(24 V selon vos LED)</text>
+<text x="830" y="584" text-anchor="middle" font-size="12" fill="#854F0B">autres canaux non utilisés</text>
+<text x="830" y="342" text-anchor="middle" font-size="12" fill="#0F6E56">A+ → bague · B- → pointe · terre → manchon</text>
+</svg>
