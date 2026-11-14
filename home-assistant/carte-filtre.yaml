@@ -26,6 +26,16 @@ cards:
   alignment: justify
   chips:
   - type: template
+    entity: sensor.eheim_3e_temperature_eau
+    icon: mdi:thermometer-water
+    icon_color: '{{ ''red'' if is_state(''binary_sensor.eheim_3e_temperature_eau_hors_plage'',''on'') else ''deep-orange'' }}'
+    content: '{% set t = states(''sensor.eheim_3e_temperature_eau'') %}{{ (t | float) | round(1) ~ '' °C'' if t not in [''unknown'',''unavailable''] else ''— °C'' }}'
+    tap_action:
+      action: more-info
+    hold_action:
+      action: more-info
+      entity: number.eheim_3e_temperature_eau_alerte_haute
+  - type: template
     entity: sensor.eheim_3e_debit_relatif
     icon: mdi:gauge
     icon_color: teal
@@ -37,13 +47,6 @@ cards:
     icon: mdi:fan
     icon_color: cyan
     content: '{{ states(''sensor.eheim_3e_vitesse_rotor'') | int(0) }} tr/min'
-    tap_action:
-      action: more-info
-  - type: template
-    entity: sensor.eheim_3e_debit_de_consigne
-    icon: mdi:target
-    icon_color: blue
-    content: '{{ states(''sensor.eheim_3e_debit_de_consigne'') | int(0) }} L/h'
     tap_action:
       action: more-info
   - type: template
@@ -302,10 +305,10 @@ cards:
     tap_action:
       action: more-info
   - type: template
-    entity: sensor.eheim_3e_signal_wi_fi
-    icon: mdi:wifi
-    icon_color: '{% set s = states(''sensor.eheim_3e_signal_wi_fi'') | int(-100) %}{{ ''green'' if s > -65 else (''orange'' if s > -80 else ''red'') }}'
-    content: '{{ states(''sensor.eheim_3e_signal_wi_fi'') | int(0) }} dBm'
+    entity: sensor.eheim_3e_debit_de_consigne
+    icon: mdi:target
+    icon_color: blue
+    content: '{{ states(''sensor.eheim_3e_debit_de_consigne'') | int(0) }} L/h'
     tap_action:
       action: more-info
   card_mod:

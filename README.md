@@ -1,6 +1,6 @@
 # eheim-3e-esphome-eclairage
 
-Supervision et commande d'un filtre extérieur **EHEIM professionel 3e** et gestion autonome d'un **éclairage LED d'aquarium** (2 canaux, drivers LDD-1000H sur carte Coralux), avec un seul **ESP32-S3** sous **ESPHome**, intégré à **Home Assistant**.
+Supervision et commande d'un filtre extérieur **EHEIM professionel 3e**, gestion autonome d'un **éclairage LED d'aquarium** (2 canaux, drivers LDD-1000H sur carte Coralux) et mesure de la **température de l'eau** (sonde DS18B20), avec un seul **ESP32-S3** sous **ESPHome**, intégré à **Home Assistant**.
 
 - La pompe est pilotée par sa prise jack (bus RS485), sans le logiciel Windows EHEIM ControlCenter ni le câble USB d'origine.
 - L'éclairage fonctionne **sans Home Assistant ni internet** : lever et coucher de soleil progressifs, horaires réglables, horloge sauvegardée par pile.
@@ -50,6 +50,11 @@ Testé sur un **2076 (professionel 3e 450), firmware 3.80**. Devrait fonctionner
 - **Autonome** : heure par internet (NTP) puis conservée par un module **DS3231** à pile ; l'éclairage continue si Home Assistant ou le Wi-Fi tombe
 - Au redémarrage, le niveau correct est recalculé à partir de l'heure
 
+### Température de l'eau
+
+- Sonde étanche **DS18B20**, mesure toutes les 30 secondes (moyenne glissante)
+- **Alerte** « température eau hors plage » avec seuils bas et haut réglables (par défaut 24 et 28 °C)
+
 ### Commun
 
 - **Page web locale** sur l'ESP32 (`http://eheim-3e.local`), utilisable sans Home Assistant
@@ -71,10 +76,11 @@ Testé sur un **2076 (professionel 3e 450), firmware 3.80**. Devrait fonctionner
 | 8 | **Alimentation 48 V** (bloc à découpage) | alimentation des drivers | LDD-H : entrée 9 à 56 V ; chaîne de LED jusqu'à 45 V environ ; puissance ≥ somme des LED + 10 % |
 | 9 | Module **RTC DS3231** (avec pile CR2032) | horloge de secours | piloté comme un DS1307 dans ESPHome |
 | 10 | **Bouton poussoir** (contact momentané) | changement de mode de l'éclairage | entre GPIO5 et GND, sans résistance |
-| 11 | Chargeur **USB-C 5 V, 1 A minimum** + câble USB-C de qualité | alimentation de l'ESP32 | un câble trop fin provoque des redémarrages |
-| 12 | Fils Dupont / fils de câblage | liaisons | |
-| 13 | *(facultatif)* **EHEIM Interface 4020740** (câble USB d'origine) | test du protocole depuis un PC | inutile une fois l'ESP32 en place |
-| 14 | *(facultatif)* Boîtier | protection près de l'aquarium | prévoir l'aération et éloigner de l'eau |
+| 11 | Sonde **DS18B20 étanche** (câble inox) + **résistance 4,7 kΩ** | température de l'eau | résistance entre DATA et 3V3 ; souvent fournie avec les modules à bornier |
+| 12 | Chargeur **USB-C 5 V, 1 A minimum** + câble USB-C de qualité | alimentation de l'ESP32 | un câble trop fin provoque des redémarrages |
+| 13 | Fils Dupont / fils de câblage | liaisons | |
+| 14 | *(facultatif)* **EHEIM Interface 4020740** (câble USB d'origine) | test du protocole depuis un PC | inutile une fois l'ESP32 en place |
+| 15 | *(facultatif)* Boîtier | protection près de l'aquarium | prévoir l'aération et éloigner de l'eau |
 
 ---
 
@@ -90,6 +96,11 @@ Version texte :
            GND ◄────────┤ GND              GPIO17  ├────────► TXD
            SDA ◄────────┤ GPIO8            GPIO18  ├────────► RXD
            SCL ◄────────┤ GPIO9            GND     ├────────► GND
+                        │                          │
+  DS18B20  VCC ◄────┬───┤ 3V3                      │
+                  4,7kΩ │                          │
+          DATA ◄────┴───┤ GPIO7                    │
+           GND ◄────────┤ GND                      │
                         │                          │
   Bouton borne 1 ◄──────┤ GPIO5            GPIO4   ├────────► entrée 1   Carte Coralux
          borne 2 ◄──────┤ GND              GPIO6   ├────────► entrée 2   (2 × LDD-1000H)
@@ -141,10 +152,21 @@ Les repères exacts des borniers peuvent varier selon la version de la carte Cor
 | **GPIO8** | DS3231 SDA | données I2C |
 | **GPIO9** | DS3231 SCL | horloge I2C |
 | **GPIO5** | bouton (l'autre borne à GND) | changement de mode de l'éclairage |
-| **3V3** | XY-K485 VCC, DS3231 VCC | alimentation des modules |
-| **GND** | XY-K485 GND, DS3231 GND, Coralux G, bouton | masse commune |
+| **GPIO7** | DS18B20 DATA (+ 4,7 kΩ vers 3V3) | température de l'eau (bus 1-Wire) |
+| **3V3** | XY-K485 VCC, DS3231 VCC, DS18B20 VCC | alimentation des modules |
+| **GND** | XY-K485 GND, DS3231 GND, DS18B20 GND, Coralux G, bouton | masse commune |
 
 Sur le XY-K485, TXD et RXD sont nommés du point de vue du microcontrôleur : on relie **TX à TXD** et **RX à RXD**, sans croiser.
+
+### Sonde DS18B20
+
+| Fil de la sonde (couleurs usuelles) | Vers l'ESP32 |
+|---|---|
+| **Rouge** : VCC | 3V3 |
+| **Jaune** (parfois blanc ou bleu) : DATA | GPIO7, avec une résistance de **4,7 kΩ** entre GPIO7 et 3V3 |
+| **Noir** : GND | GND |
+
+Sans la résistance de 4,7 kΩ, la sonde n'est pas détectée. Les couleurs varient selon les fabricants : vérifier la notice de la sonde.
 
 ### Module XY-K485 ↔ jack de la pompe
 
@@ -191,6 +213,7 @@ Un seul maître sur le bus : le logiciel ControlCenter et l'ESP32 ne peuvent pas
 | Alertes filtre | pompe en marche, erreur rotor, erreur air, erreur température, consigne non atteinte, débit faible |
 | Commandes filtre | mode pompe, palier débit (flux constant), Bio : palier 12 premières heures / 12 heures suivantes / début, Stream : palier haut / bas, durée phase haute / basse, Manuel : débit plus / moins |
 | Éclairage | éclairage canal 1, éclairage canal 2, mode éclairage, lever : heure de début / durée, coucher : heure de début / durée, intensité maximale canal 1 / 2, canal 2 : avance au lever / retard au coucher, retour auto au prochain lever/coucher, bouton éclairage |
+| Température | température eau, température eau hors plage, température eau : alerte basse / alerte haute |
 | Diagnostic | pompe connectée, firmware pompe, type de pompe, courant (brut), mode (bits bruts), signal Wi-Fi, redémarrer |
 
 ---
@@ -268,6 +291,7 @@ Remplacer `COM3` par le port affiché dans le Gestionnaire de périphériques (�
 | « Pompe connectée » reste à OFF | inverser A+ et B- ; puis inverser TXD et RXD ; vérifier la masse commune |
 | Les LED ne s'allument pas | masse commune ESP32 ↔ Coralux (G) ; alimentation des drivers ; mode éclairage sur « Forcé allumé » pour tester |
 | Mauvaise heure d'éclairage | fuseau horaire dans `time:` ; pile du DS3231 ; câblage SDA / SCL |
+| Température absente ou à 85 °C | résistance de 4,7 kΩ manquante ; fils DATA et VCC inversés ; sonde non détectée au démarrage (voir le journal) |
 | Le mode Bio ne s'active pas | l'ESP32 ne connaît pas encore l'heure (journal : « Heure inconnue ») |
 | Le port COM n'apparaît pas au flashage | essayer l'autre prise USB-C de la carte ; utiliser Chrome ou Edge |
 | Redémarrages de l'ESP32 | chargeur ou câble USB trop faible |

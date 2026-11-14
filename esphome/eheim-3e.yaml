@@ -1,10 +1,11 @@
-# EHEIM professionel 3e + éclairage LED (LDD-1000H sur carte Coralux)
+# EHEIM professionel 3e + éclairage LED (LDD-1000H sur carte Coralux) + température de l'eau
 # ESP32-S3 (N16R8), ESPHome. Fichiers : ce YAML + eheim3e.h dans le même dossier ESPHome.
 #
-# Filtre    : GPIO17 -> TXD, GPIO18 -> RXD (module XY-K485), A+ / B- / terre -> jack de la pompe
-# Éclairage : GPIO4 -> entrée 1, GPIO6 -> entrée 2 de la carte Coralux, GND -> G
-# Horloge   : DS3231, SDA = GPIO8, SCL = GPIO9
-# Bouton    : GPIO5 <-> GND (Auto -> Forcé allumé -> Forcé éteint)
+# Filtre      : GPIO17 -> TXD, GPIO18 -> RXD (module XY-K485), A+ / B- / terre -> jack de la pompe
+# Éclairage   : GPIO4 -> entrée 1, GPIO6 -> entrée 2 de la carte Coralux, GND -> G
+# Horloge     : DS3231, SDA = GPIO8, SCL = GPIO9
+# Bouton      : GPIO5 <-> GND (Auto -> Forcé allumé -> Forcé éteint)
+# Température : DS18B20, données sur GPIO7 avec résistance 4,7 kΩ vers 3V3
 
 esphome:
   name: eheim-3e
@@ -253,7 +254,26 @@ script:
           }
 
 # ---------------------------------------------------------------- capteurs
+# ---------------------------------------------------------------- sonde DS18B20
+# Fil de données sur GPIO7, résistance de 4,7 kΩ entre GPIO7 et 3V3
+one_wire:
+  - platform: gpio
+    pin: GPIO7
+
 sensor:
+  - platform: dallas_temp
+    id: temp_eau
+    name: "Température eau"
+    device_class: temperature
+    state_class: measurement
+    unit_of_measurement: "°C"
+    accuracy_decimals: 1
+    update_interval: 30s
+    filters:
+      - filter_out: 85.0          # valeur de mise sous tension du DS18B20
+      - sliding_window_moving_average:
+          window_size: 4
+          send_every: 1
   - platform: template
     id: debit_consigne
     name: "Débit de consigne"
@@ -386,6 +406,18 @@ binary_sensor:
       return id(debit_relatif).state < 70.0f;
     filters:
       - delayed_on: 10min
+      - delayed_off: 1min
+  - platform: template
+    id: temp_hors_plage
+    name: "Température eau hors plage"
+    device_class: problem
+    icon: mdi:thermometer-alert
+    lambda: |-
+      if (!id(temp_eau).has_state()) return {};
+      float t = id(temp_eau).state;
+      return t < id(temp_min).state || t > id(temp_max).state;
+    filters:
+      - delayed_on: 2min
       - delayed_off: 1min
   - platform: template
     name: "Pompe connectée"
@@ -529,6 +561,30 @@ switch:
     restore_mode: RESTORE_DEFAULT_ON
 
 number:
+  - platform: template
+    id: temp_min
+    name: "Température eau : alerte basse"
+    icon: mdi:thermometer-low
+    unit_of_measurement: "°C"
+    min_value: 15
+    max_value: 30
+    step: 0.5
+    initial_value: 24
+    optimistic: true
+    restore_value: true
+    mode: box
+  - platform: template
+    id: temp_max
+    name: "Température eau : alerte haute"
+    icon: mdi:thermometer-high
+    unit_of_measurement: "°C"
+    min_value: 20
+    max_value: 35
+    step: 0.5
+    initial_value: 28
+    optimistic: true
+    restore_value: true
+    mode: box
   - platform: template
     id: lever_duree
     name: "Lever : durée"
