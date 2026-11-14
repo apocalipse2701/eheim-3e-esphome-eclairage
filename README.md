@@ -68,7 +68,7 @@ Testé sur un **2076 (professionel 3e 450), firmware 3.80**. Devrait fonctionner
 | 5 | Fiche **jack 3,5 mm mâle stéréo (3 points)** avec bornier à vis | connexion à la pompe | ou un câble audio jack coupé |
 | 6 | **Carte Coralux** pour drivers LDD-H | support des drivers et entrées PWM | résistances de 10 kΩ déjà sur la carte |
 | 7 | **2 × Mean Well LDD-1000H** | drivers LED à courant constant 1000 mA | un par canal ; LDD-H : PWM de 100 Hz à 1 kHz |
-| 8 | **Alimentation LED** (par ex. 24 V) | alimentation des drivers | tension supérieure d'environ 3 V à celle de la chaîne de LED la plus longue |
+| 8 | **Alimentation 48 V** (bloc à découpage) | alimentation des drivers | LDD-H : entrée 9 à 56 V ; chaîne de LED jusqu'à 45 V environ ; puissance ≥ somme des LED + 10 % |
 | 9 | Module **RTC DS3231** (avec pile CR2032) | horloge de secours | piloté comme un DS1307 dans ESPHome |
 | 10 | **Bouton poussoir** (contact momentané) | changement de mode de l'éclairage | entre GPIO5 et GND, sans résistance |
 | 11 | Chargeur **USB-C 5 V, 1 A minimum** + câble USB-C de qualité | alimentation de l'ESP32 | un câble trop fin provoque des redémarrages |
@@ -99,7 +99,24 @@ Version texte :
                                  USB-C 5 V
 ```
 
-Le jack de la pompe et le module XY-K485 :
+### Éclairage : carte Coralux, LDD-1000H, alimentation 48 V et horloge
+
+![Éclairage : ESP32-S3, carte Coralux, LDD-1000H, alimentation 48 V et DS3231](docs/eclairage-coralux-48v.svg)
+
+| De | Vers | Fil |
+|---|---|---|
+| Alimentation 48 V **+V** | Coralux **V+** | rouge, section adaptée au courant |
+| Alimentation 48 V **−V** | Coralux **GND** | noir |
+| ESP32 **GPIO4** | Coralux **entrée 1** (DIM du LDD canal 1) | signal PWM |
+| ESP32 **GPIO6** | Coralux **entrée 2** (DIM du LDD canal 2) | signal PWM |
+| ESP32 **GND** | Coralux **G** | masse commune, indispensable |
+| Coralux **LED1 + / −** | chaîne de LED du canal 1 | respecter la polarité |
+| Coralux **LED2 + / −** | chaîne de LED du canal 2 | respecter la polarité |
+| ESP32 **3V3 / GND / GPIO8 / GPIO9** | DS3231 **VCC / GND / SDA / SCL** | pile CR2032 au dos du module |
+
+Les repères exacts des borniers peuvent varier selon la version de la carte Coralux : se fier à sa sérigraphie. L'ESP32 reste alimenté par son chargeur USB 5 V, **jamais par le 48 V**.
+
+### Filtre : jack de la pompe et module XY-K485
 
 ![Câblage ESP32-S3 et module XY-K485](docs/esp32-xy-k485.svg)
 

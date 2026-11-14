@@ -1,0 +1,205 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1240 800" width="1240" height="800" font-family="Segoe UI, Helvetica, Arial, sans-serif">
+<title>Éclairage : ESP32-S3, carte Coralux, 2 × LDD-1000H, alimentation 48 V et horloge DS3231</title>
+<defs><marker id="ar" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#5F5E5A"/></marker></defs>
+<rect width="1240" height="800" rx="14" fill="#fff"/>
+<text x="620.0" y="38" text-anchor="middle" font-size="23" font-weight="600" fill="#222">Éclairage LED : câblage complet</text>
+<text x="620.0" y="62" text-anchor="middle" font-size="14" fill="#666">ESP32-S3 · carte Coralux · 2 × LDD-1000H · alimentation 48 V · horloge DS3231</text>
+<rect x="470" y="90" width="300" height="120" rx="14" fill="#F1EFE8" stroke="#5F5E5A" stroke-width="2"/>
+<text x="620.0" y="118" text-anchor="middle" font-size="17" font-weight="600" fill="#2C2C2A">Alimentation 48 V</text>
+<text x="620.0" y="137" text-anchor="middle" font-size="12" font-weight="400" fill="#5F5E5A">bloc à découpage, par ex. Mean Well</text>
+<text x="500" y="160" text-anchor="start" font-size="13" font-weight="600" fill="#2C2C2A">230 V ~</text>
+<text x="500" y="178" text-anchor="start" font-size="12" font-weight="400" fill="#5F5E5A">L · N · terre</text>
+<path d="M 490 150 L 440 150" stroke="#8B5A2B" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M 490 165 L 440 165" stroke="#3B6FB6" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M 490 180 L 440 180" stroke="#3C9A3C" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="432" y="152" text-anchor="end" font-size="12" font-weight="400" fill="#5F5E5A">secteur</text>
+<rect x="681" y="181" width="18" height="18" rx="3" fill="#2E8B57" stroke="#1d5c3a"/><circle cx="690" cy="190" r="4" fill="#cfe9d8" stroke="#1d5c3a"/>
+<text x="690" y="175" text-anchor="middle" font-size="13" font-weight="600" fill="#2C2C2A">+V</text>
+<rect x="731" y="181" width="18" height="18" rx="3" fill="#2E8B57" stroke="#1d5c3a"/><circle cx="740" cy="190" r="4" fill="#cfe9d8" stroke="#1d5c3a"/>
+<text x="740" y="175" text-anchor="middle" font-size="13" font-weight="600" fill="#2C2C2A">−V</text>
+<rect x="400" y="290" width="520" height="365" rx="14" fill="#FAEEDA" stroke="#BA7517" stroke-width="2"/>
+<text x="420" y="320" text-anchor="start" font-size="17" font-weight="600" fill="#854F0B">Carte Coralux</text>
+<text x="420" y="339" text-anchor="start" font-size="12" font-weight="400" fill="#BA7517">support pour drivers LDD-H</text>
+<rect x="771" y="281" width="18" height="18" rx="3" fill="#2E8B57" stroke="#1d5c3a"/><circle cx="780" cy="290" r="4" fill="#cfe9d8" stroke="#1d5c3a"/>
+<text x="780" y="317" text-anchor="middle" font-size="13" font-weight="600" fill="#854F0B"></text>
+<rect x="831" y="281" width="18" height="18" rx="3" fill="#2E8B57" stroke="#1d5c3a"/><circle cx="840" cy="290" r="4" fill="#cfe9d8" stroke="#1d5c3a"/>
+<text x="840" y="317" text-anchor="middle" font-size="13" font-weight="600" fill="#854F0B"></text>
+<text x="780" y="320" text-anchor="middle" font-size="12" font-weight="700" fill="#854F0B">V+</text>
+<text x="840" y="320" text-anchor="middle" font-size="12" font-weight="700" fill="#854F0B">GND</text>
+<path d="M 690 199 L 690 240 L 780 240 L 780 281" stroke="#D0312D" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M 740 199 L 740 255 L 840 255 L 840 281" stroke="#222222" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M 780 299 L 780 355 L 500 355 L 500 550" stroke="#D0312D" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M 840 299 L 840 368 L 525 368 L 525 600" stroke="#222222" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="494" y="388" text-anchor="end" font-size="11" font-weight="600" fill="#a32622">V+</text>
+<text x="531" y="388" text-anchor="start" font-size="11" font-weight="600" fill="#222">GND</text>
+<rect x="600" y="385" width="160" height="90" rx="8" fill="#ffffff" stroke="#444441" stroke-width="2"/>
+<text x="680" y="425" text-anchor="middle" font-size="15" font-weight="700" fill="#2C2C2A">LDD-1000H</text>
+<text x="680" y="443" text-anchor="middle" font-size="11" font-weight="400" fill="#5F5E5A">canal 1 · 1000 mA</text>
+<rect x="594" y="397" width="10" height="6" fill="#9a9a96"/>
+<text x="608" y="404" text-anchor="start" font-size="10" font-weight="400" fill="#444441">DIM</text>
+<rect x="594" y="427" width="10" height="6" fill="#9a9a96"/>
+<text x="608" y="434" text-anchor="start" font-size="10" font-weight="400" fill="#444441">+Vin</text>
+<rect x="594" y="457" width="10" height="6" fill="#9a9a96"/>
+<text x="608" y="464" text-anchor="start" font-size="10" font-weight="400" fill="#444441">−Vin</text>
+<rect x="756" y="412" width="10" height="6" fill="#9a9a96"/>
+<text x="752" y="419" text-anchor="end" font-size="10" font-weight="400" fill="#444441">+Vo</text>
+<rect x="756" y="442" width="10" height="6" fill="#9a9a96"/>
+<text x="752" y="449" text-anchor="end" font-size="10" font-weight="400" fill="#444441">−Vo</text>
+<rect x="600" y="505" width="160" height="90" rx="8" fill="#ffffff" stroke="#444441" stroke-width="2"/>
+<text x="680" y="545" text-anchor="middle" font-size="15" font-weight="700" fill="#2C2C2A">LDD-1000H</text>
+<text x="680" y="563" text-anchor="middle" font-size="11" font-weight="400" fill="#5F5E5A">canal 2 · 1000 mA</text>
+<rect x="594" y="517" width="10" height="6" fill="#9a9a96"/>
+<text x="608" y="524" text-anchor="start" font-size="10" font-weight="400" fill="#444441">DIM</text>
+<rect x="594" y="547" width="10" height="6" fill="#9a9a96"/>
+<text x="608" y="554" text-anchor="start" font-size="10" font-weight="400" fill="#444441">+Vin</text>
+<rect x="594" y="577" width="10" height="6" fill="#9a9a96"/>
+<text x="608" y="584" text-anchor="start" font-size="10" font-weight="400" fill="#444441">−Vin</text>
+<rect x="756" y="532" width="10" height="6" fill="#9a9a96"/>
+<text x="752" y="539" text-anchor="end" font-size="10" font-weight="400" fill="#444441">+Vo</text>
+<rect x="756" y="562" width="10" height="6" fill="#9a9a96"/>
+<text x="752" y="569" text-anchor="end" font-size="10" font-weight="400" fill="#444441">−Vo</text>
+<path d="M 500 430 L 594 430" stroke="#D0312D" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="518" y="427" width="14" height="6" fill="#FAEEDA"/>
+<path d="M 518 430 A 7 7 0 0 1 532 430" stroke="#D0312D" stroke-width="2.2" fill="none"/>
+<path d="M 525 460 L 594 460" stroke="#222222" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="500" cy="430" r="3.5" fill="#D0312D"/><circle cx="525" cy="460" r="3.5" fill="#222222"/>
+<path d="M 500 550 L 594 550" stroke="#D0312D" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="518" y="547" width="14" height="6" fill="#FAEEDA"/>
+<path d="M 518 550 A 7 7 0 0 1 532 550" stroke="#D0312D" stroke-width="2.2" fill="none"/>
+<path d="M 525 580 L 594 580" stroke="#222222" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="500" cy="550" r="3.5" fill="#D0312D"/><circle cx="525" cy="580" r="3.5" fill="#222222"/>
+<rect x="391" y="391" width="18" height="18" rx="3" fill="#2E8B57" stroke="#1d5c3a"/><circle cx="400" cy="400" r="4" fill="#cfe9d8" stroke="#1d5c3a"/>
+<text x="400" y="427" text-anchor="middle" font-size="13" font-weight="600" fill="#854F0B"></text>
+<rect x="391" y="511" width="18" height="18" rx="3" fill="#2E8B57" stroke="#1d5c3a"/><circle cx="400" cy="520" r="4" fill="#cfe9d8" stroke="#1d5c3a"/>
+<text x="400" y="547" text-anchor="middle" font-size="13" font-weight="600" fill="#854F0B"></text>
+<rect x="391" y="591" width="18" height="18" rx="3" fill="#2E8B57" stroke="#1d5c3a"/><circle cx="400" cy="600" r="4" fill="#cfe9d8" stroke="#1d5c3a"/>
+<text x="400" y="627" text-anchor="middle" font-size="13" font-weight="600" fill="#854F0B"></text>
+<text x="414" y="390" text-anchor="start" font-size="12" font-weight="600" fill="#854F0B">entrée 1</text>
+<text x="414" y="510" text-anchor="start" font-size="12" font-weight="600" fill="#854F0B">entrée 2</text>
+<text x="414" y="590" text-anchor="start" font-size="12" font-weight="700" fill="#854F0B">G</text>
+<path d="M 409 400 L 565 400 L 565 400 L 594 400" stroke="#BA7517" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="493" y="397" width="14" height="6" fill="#FAEEDA"/>
+<path d="M 493 400 A 7 7 0 0 1 507 400" stroke="#BA7517" stroke-width="2.2" fill="none"/>
+<rect x="518" y="397" width="14" height="6" fill="#FAEEDA"/>
+<path d="M 518 400 A 7 7 0 0 1 532 400" stroke="#BA7517" stroke-width="2.2" fill="none"/>
+<path d="M 409 520 L 565 520 L 565 520 L 594 520" stroke="#BA7517" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="493" y="517" width="14" height="6" fill="#FAEEDA"/>
+<path d="M 493 520 A 7 7 0 0 1 507 520" stroke="#BA7517" stroke-width="2.2" fill="none"/>
+<rect x="518" y="517" width="14" height="6" fill="#FAEEDA"/>
+<path d="M 518 520 A 7 7 0 0 1 532 520" stroke="#BA7517" stroke-width="2.2" fill="none"/>
+<path d="M 409 600 L 525 600" stroke="#222222" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="525" cy="600" r="3.5" fill="#222222"/>
+<rect x="911" y="406" width="18" height="18" rx="3" fill="#2E8B57" stroke="#1d5c3a"/><circle cx="920" cy="415" r="4" fill="#cfe9d8" stroke="#1d5c3a"/>
+<text x="920" y="442" text-anchor="middle" font-size="13" font-weight="600" fill="#854F0B"></text>
+<rect x="911" y="436" width="18" height="18" rx="3" fill="#2E8B57" stroke="#1d5c3a"/><circle cx="920" cy="445" r="4" fill="#cfe9d8" stroke="#1d5c3a"/>
+<text x="920" y="472" text-anchor="middle" font-size="13" font-weight="600" fill="#854F0B"></text>
+<path d="M 766 415 L 911 415" stroke="#D0312D" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M 766 445 L 911 445" stroke="#222222" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="906" y="409" text-anchor="end" font-size="11" font-weight="600" fill="#854F0B">LED1 +</text>
+<text x="906" y="439" text-anchor="end" font-size="11" font-weight="600" fill="#854F0B">LED1 −</text>
+<rect x="911" y="526" width="18" height="18" rx="3" fill="#2E8B57" stroke="#1d5c3a"/><circle cx="920" cy="535" r="4" fill="#cfe9d8" stroke="#1d5c3a"/>
+<text x="920" y="562" text-anchor="middle" font-size="13" font-weight="600" fill="#854F0B"></text>
+<rect x="911" y="556" width="18" height="18" rx="3" fill="#2E8B57" stroke="#1d5c3a"/><circle cx="920" cy="565" r="4" fill="#cfe9d8" stroke="#1d5c3a"/>
+<text x="920" y="592" text-anchor="middle" font-size="13" font-weight="600" fill="#854F0B"></text>
+<path d="M 766 535 L 911 535" stroke="#D0312D" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M 766 565 L 911 565" stroke="#222222" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="906" y="529" text-anchor="end" font-size="11" font-weight="600" fill="#854F0B">LED2 +</text>
+<text x="906" y="559" text-anchor="end" font-size="11" font-weight="600" fill="#854F0B">LED2 −</text>
+<text x="660.0" y="643" text-anchor="middle" font-size="12" font-weight="400" fill="#BA7517">traits fins : pistes de la carte, rien à câbler</text>
+<text x="980" y="385" text-anchor="start" font-size="14" font-weight="600" fill="#2C2C2A">Canal 1 (par ex. blanc)</text>
+<path d="M 990 405 L 1008 415 L 990 425 Z" fill="#F5C542" stroke="#444" stroke-width="1.5"/><line x1="1008" y1="405" x2="1008" y2="425" stroke="#444" stroke-width="2"/>
+<path d="M 1002 401 l 6 -8 M 1008 401 l 6 -8" stroke="#F5C542" stroke-width="1.5"/>
+<line x1="1008" y1="415" x2="1034" y2="415" stroke="#444" stroke-width="2"/>
+<path d="M 1034 405 L 1052 415 L 1034 425 Z" fill="#F5C542" stroke="#444" stroke-width="1.5"/><line x1="1052" y1="405" x2="1052" y2="425" stroke="#444" stroke-width="2"/>
+<path d="M 1046 401 l 6 -8 M 1052 401 l 6 -8" stroke="#F5C542" stroke-width="1.5"/>
+<line x1="1052" y1="415" x2="1078" y2="415" stroke="#444" stroke-width="2"/>
+<path d="M 1078 405 L 1096 415 L 1078 425 Z" fill="#F5C542" stroke="#444" stroke-width="1.5"/><line x1="1096" y1="405" x2="1096" y2="425" stroke="#444" stroke-width="2"/>
+<path d="M 1090 401 l 6 -8 M 1096 401 l 6 -8" stroke="#F5C542" stroke-width="1.5"/>
+<line x1="1096" y1="415" x2="1122" y2="415" stroke="#444" stroke-width="2"/>
+<path d="M 1122 405 L 1140 415 L 1122 425 Z" fill="#F5C542" stroke="#444" stroke-width="1.5"/><line x1="1140" y1="405" x2="1140" y2="425" stroke="#444" stroke-width="2"/>
+<path d="M 1134 401 l 6 -8 M 1140 401 l 6 -8" stroke="#F5C542" stroke-width="1.5"/>
+<line x1="1140" y1="415" x2="1166" y2="415" stroke="#444" stroke-width="2"/>
+<path d="M 1166 405 L 1184 415 L 1166 425 Z" fill="#F5C542" stroke="#444" stroke-width="1.5"/><line x1="1184" y1="405" x2="1184" y2="425" stroke="#444" stroke-width="2"/>
+<path d="M 1178 401 l 6 -8 M 1184 401 l 6 -8" stroke="#F5C542" stroke-width="1.5"/>
+<path d="M 929 415 L 990 415" stroke="#D0312D" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M 929 445 L 1215 445 L 1215 415 L 1184 415" stroke="#222222" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="980" y="505" text-anchor="start" font-size="14" font-weight="600" fill="#2C2C2A">Canal 2 (par ex. bleu)</text>
+<path d="M 990 525 L 1008 535 L 990 545 Z" fill="#4A7BD1" stroke="#444" stroke-width="1.5"/><line x1="1008" y1="525" x2="1008" y2="545" stroke="#444" stroke-width="2"/>
+<path d="M 1002 521 l 6 -8 M 1008 521 l 6 -8" stroke="#4A7BD1" stroke-width="1.5"/>
+<line x1="1008" y1="535" x2="1034" y2="535" stroke="#444" stroke-width="2"/>
+<path d="M 1034 525 L 1052 535 L 1034 545 Z" fill="#4A7BD1" stroke="#444" stroke-width="1.5"/><line x1="1052" y1="525" x2="1052" y2="545" stroke="#444" stroke-width="2"/>
+<path d="M 1046 521 l 6 -8 M 1052 521 l 6 -8" stroke="#4A7BD1" stroke-width="1.5"/>
+<line x1="1052" y1="535" x2="1078" y2="535" stroke="#444" stroke-width="2"/>
+<path d="M 1078 525 L 1096 535 L 1078 545 Z" fill="#4A7BD1" stroke="#444" stroke-width="1.5"/><line x1="1096" y1="525" x2="1096" y2="545" stroke="#444" stroke-width="2"/>
+<path d="M 1090 521 l 6 -8 M 1096 521 l 6 -8" stroke="#4A7BD1" stroke-width="1.5"/>
+<line x1="1096" y1="535" x2="1122" y2="535" stroke="#444" stroke-width="2"/>
+<path d="M 1122 525 L 1140 535 L 1122 545 Z" fill="#4A7BD1" stroke="#444" stroke-width="1.5"/><line x1="1140" y1="525" x2="1140" y2="545" stroke="#444" stroke-width="2"/>
+<path d="M 1134 521 l 6 -8 M 1140 521 l 6 -8" stroke="#4A7BD1" stroke-width="1.5"/>
+<line x1="1140" y1="535" x2="1166" y2="535" stroke="#444" stroke-width="2"/>
+<path d="M 1166 525 L 1184 535 L 1166 545 Z" fill="#4A7BD1" stroke="#444" stroke-width="1.5"/><line x1="1184" y1="525" x2="1184" y2="545" stroke="#444" stroke-width="2"/>
+<path d="M 1178 521 l 6 -8 M 1184 521 l 6 -8" stroke="#4A7BD1" stroke-width="1.5"/>
+<path d="M 929 535 L 990 535" stroke="#D0312D" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M 929 565 L 1215 565 L 1215 535 L 1184 535" stroke="#222222" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="1095" y="470" text-anchor="middle" font-size="11" font-weight="400" fill="#5F5E5A">chaîne en série ≤ 45 V environ</text>
+<text x="1095" y="590" text-anchor="middle" font-size="11" font-weight="400" fill="#5F5E5A">1 A maximum par canal</text>
+<rect x="40" y="300" width="230" height="330" rx="14" fill="#EEEDFE" stroke="#534AB7" stroke-width="2"/>
+<text x="155.0" y="328" text-anchor="middle" font-size="17" font-weight="600" fill="#3C3489">ESP32-S3</text>
+<text x="155.0" y="347" text-anchor="middle" font-size="12" font-weight="400" fill="#534AB7">DevKit N16R8</text>
+<circle cx="270" cy="400" r="7" fill="#fff" stroke="#534AB7" stroke-width="2"/>
+<text x="256" y="405" text-anchor="end" font-size="13" font-weight="600" fill="#3C3489">GPIO4</text>
+<circle cx="270" cy="520" r="7" fill="#fff" stroke="#534AB7" stroke-width="2"/>
+<text x="256" y="525" text-anchor="end" font-size="13" font-weight="600" fill="#3C3489">GPIO6</text>
+<circle cx="270" cy="600" r="7" fill="#fff" stroke="#534AB7" stroke-width="2"/>
+<text x="256" y="605" text-anchor="end" font-size="13" font-weight="600" fill="#3C3489">GND</text>
+<path d="M 277 400 L 391 400" stroke="#BA7517" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M 277 520 L 391 520" stroke="#BA7517" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M 277 600 L 391 600" stroke="#222222" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="335" y="390" text-anchor="middle" font-size="11" font-weight="400" fill="#854F0B">PWM 1 kHz</text>
+<text x="335" y="510" text-anchor="middle" font-size="11" font-weight="400" fill="#854F0B">PWM 1 kHz</text>
+<text x="335" y="590" text-anchor="middle" font-size="11" font-weight="400" fill="#222">masse commune</text>
+<circle cx="80" cy="630" r="7" fill="#fff" stroke="#534AB7" stroke-width="2"/>
+<text x="80" y="618" text-anchor="middle" font-size="11" font-weight="600" fill="#3C3489">3V3</text>
+<circle cx="130" cy="630" r="7" fill="#fff" stroke="#534AB7" stroke-width="2"/>
+<text x="130" y="618" text-anchor="middle" font-size="11" font-weight="600" fill="#3C3489">GND</text>
+<circle cx="180" cy="630" r="7" fill="#fff" stroke="#534AB7" stroke-width="2"/>
+<text x="180" y="618" text-anchor="middle" font-size="11" font-weight="600" fill="#3C3489">GPIO8</text>
+<circle cx="230" cy="630" r="7" fill="#fff" stroke="#534AB7" stroke-width="2"/>
+<text x="230" y="618" text-anchor="middle" font-size="11" font-weight="600" fill="#3C3489">GPIO9</text>
+<rect x="120" y="570" width="70" height="24" rx="8" fill="#444441"/>
+<text x="155" y="587" text-anchor="middle" font-size="12" font-weight="400" fill="#fff">USB-C</text>
+<path d="M 40 582 L 20 582 L 20 250 L 110 250" stroke="#444441" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="60" y="215" width="180" height="60" rx="10" fill="#F1EFE8" stroke="#5F5E5A" stroke-width="2"/>
+<text x="150.0" y="243" text-anchor="middle" font-size="17" font-weight="600" fill="#2C2C2A">Chargeur USB 5 V</text>
+<text x="150" y="262" text-anchor="middle" font-size="11" font-weight="400" fill="#5F5E5A">séparé du 48 V</text>
+<rect x="40" y="690" width="520" height="90" rx="12" fill="#E6F1FB" stroke="#185FA5" stroke-width="2"/>
+<text x="300.0" y="718" text-anchor="middle" font-size="17" font-weight="600" fill="#0C447C"></text>
+<text x="60" y="722" text-anchor="start" font-size="17" font-weight="600" fill="#0C447C">Horloge RTC DS3231</text>
+<text x="60" y="742" text-anchor="start" font-size="12" font-weight="400" fill="#185FA5">garde l’heure sans réseau</text>
+<text x="60" y="760" text-anchor="start" font-size="12" font-weight="400" fill="#185FA5">(I2C, adresse 0x68)</text>
+<circle cx="80" cy="690" r="7" fill="#fff" stroke="#185FA5" stroke-width="2"/>
+<circle cx="130" cy="690" r="7" fill="#fff" stroke="#185FA5" stroke-width="2"/>
+<circle cx="180" cy="690" r="7" fill="#fff" stroke="#185FA5" stroke-width="2"/>
+<circle cx="230" cy="690" r="7" fill="#fff" stroke="#185FA5" stroke-width="2"/>
+<text x="80" y="712" text-anchor="start" font-size="1" font-weight="400" fill="#222"></text>
+<path d="M 80 637 L 80 683" stroke="#D0312D" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M 130 637 L 130 683" stroke="#222222" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M 180 637 L 180 683" stroke="#185FA5" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M 230 637 L 230 683" stroke="#185FA5" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="86" y="667" text-anchor="start" font-size="11" font-weight="600" fill="#0C447C">VCC</text>
+<text x="136" y="667" text-anchor="start" font-size="11" font-weight="600" fill="#0C447C">GND</text>
+<text x="186" y="667" text-anchor="start" font-size="11" font-weight="600" fill="#0C447C">SDA</text>
+<text x="236" y="667" text-anchor="start" font-size="11" font-weight="600" fill="#0C447C">SCL</text>
+<circle cx="440" cy="735" r="34" fill="#d9d9d6" stroke="#5F5E5A" stroke-width="2"/><circle cx="440" cy="735" r="27" fill="#ecebe8" stroke="#9a9a96"/>
+<text x="440" y="731" text-anchor="middle" font-size="12" font-weight="700" fill="#2C2C2A">CR2032</text>
+<text x="440" y="747" text-anchor="middle" font-size="11" font-weight="400" fill="#5F5E5A">3 V</text>
+<text x="490" y="722" text-anchor="start" font-size="12" font-weight="600" fill="#0C447C">pile</text>
+<text x="490" y="738" text-anchor="start" font-size="12" font-weight="400" fill="#185FA5">au dos</text>
+<text x="490" y="754" text-anchor="start" font-size="12" font-weight="400" fill="#185FA5">du module</text>
+<rect x="940" y="640" width="280" height="140" rx="12" fill="#E1F5EE" stroke="#0F6E56" stroke-width="2"/>
+<text x="1080.0" y="668" text-anchor="middle" font-size="17" font-weight="600" fill="#085041">À respecter</text>
+<text x="958" y="688" text-anchor="start" font-size="12" font-weight="400" fill="#085041">• 48 V seulement vers la carte Coralux</text>
+<text x="958" y="707" text-anchor="start" font-size="12" font-weight="400" fill="#085041">• LDD-H : entrée 9 à 56 V max</text>
+<text x="958" y="726" text-anchor="start" font-size="12" font-weight="400" fill="#085041">• relier GND ESP32 au G de la carte</text>
+<text x="958" y="745" text-anchor="start" font-size="12" font-weight="400" fill="#085041">• jamais de 48 V sur l’ESP32</text>
+<text x="958" y="764" text-anchor="start" font-size="12" font-weight="400" fill="#085041">• couper le secteur avant de câbler</text>
+</svg>
