@@ -77,7 +77,7 @@ Testé sur un **2076 (professionel 3e 450), firmware 3.80**. Devrait fonctionner
 | 9 | Module **RTC DS3231** (avec pile CR2032) | horloge de secours | piloté comme un DS1307 dans ESPHome |
 | 10 | **Bouton poussoir** (contact momentané) | changement de mode de l'éclairage | entre GPIO5 et GND, sans résistance |
 | 11 | Sonde **DS18B20 étanche** (câble inox) + **résistance 4,7 kΩ** | température de l'eau | résistance entre DATA et 3V3 ; souvent fournie avec les modules à bornier |
-| 12 | Chargeur **USB-C 5 V, 1 A minimum** + câble USB-C de qualité | alimentation de l'ESP32 | un câble trop fin provoque des redémarrages |
+| 12 | **Convertisseur abaisseur 48 V → 5 V** (par ex. HW-636), **entrée ≥ 60 V**, sortie ≥ 1 A | alimentation de l'ESP32 depuis le 48 V | vérifier la puce : MP1584, Mini-360 ou LM2596 standard ne tiennent pas 48 V ; à défaut, chargeur USB-C 5 V, 1 A |
 | 13 | Fils Dupont / fils de câblage | liaisons | |
 | 14 | *(facultatif)* **EHEIM Interface 4020740** (câble USB d'origine) | test du protocole depuis un PC | inutile une fois l'ESP32 en place |
 | 15 | *(facultatif)* Boîtier | protection près de l'aquarium | prévoir l'aération et éloigner de l'eau |
@@ -107,7 +107,8 @@ Version texte :
                         │                  GND     ├────────► G
                         │        ESP32-S3          │
                         └────────────┬─────────────┘
-                                 USB-C 5 V
+                                5V ◄── convertisseur 48 V → 5 V
+                                       (ou chargeur USB-C 5 V)
 ```
 
 ### Éclairage : carte Coralux, LDD-1000H, alimentation 48 V et horloge
@@ -125,7 +126,26 @@ Version texte :
 | Coralux **LED2 + / −** | chaîne de LED du canal 2 | respecter la polarité |
 | ESP32 **3V3 / GND / GPIO8 / GPIO9** | DS3231 **VCC / GND / SDA / SCL** | pile CR2032 au dos du module |
 
-Les repères exacts des borniers peuvent varier selon la version de la carte Coralux : se fier à sa sérigraphie. L'ESP32 reste alimenté par son chargeur USB 5 V, **jamais par le 48 V**.
+Les repères exacts des borniers peuvent varier selon la version de la carte Coralux : se fier à sa sérigraphie.
+
+### Alimentation de l'ESP32 par le 48 V
+
+Une seule alimentation fait tout fonctionner : un convertisseur abaisseur prend le 48 V et fournit 5 V à l'ESP32.
+
+| De | Vers |
+|---|---|
+| Alimentation 48 V **+V** | convertisseur **IN+** |
+| Alimentation 48 V **−V** | convertisseur **IN−** |
+| convertisseur **OUT+** (5,0 V) | ESP32 **5V** (ou VIN) |
+| convertisseur **OUT−** | ESP32 **GND** |
+
+1. **Vérifier que le convertisseur accepte au moins 60 V en entrée.** Une alimentation 48 V délivre souvent 48 à 50 V, et jusqu'à 53 V une fois réglée au maximum. Le nom « HW-636 » est utilisé pour plusieurs modules différents : se fier à la référence de la puce ou à la fiche du vendeur.
+2. **Régler la sortie à 5,0 V au multimètre avant de brancher l'ESP32** (modules réglables souvent livrés à une tension plus élevée).
+3. Brancher sur la broche **5V**, **jamais sur 3V3**.
+4. **Ne pas brancher l'USB en même temps que le 48 V** : débrancher le 48 V pour un flashage par USB, ou mettre à jour par le réseau (OTA).
+5. Le convertisseur n'étant pas isolé, le GND de l'ESP32 est relié au −V de l'alimentation : la masse commune avec la carte Coralux est ainsi assurée. Garder quand même le fil GND ↔ G.
+
+Si l'alimentation 48 V tombe en panne, l'ESP32 s'arrête aussi (plus de surveillance du filtre ni d'alerte de température). Pour garder la surveillance indépendante, alimenter l'ESP32 par un chargeur USB-C 5 V à la place.
 
 ### Filtre : jack de la pompe et module XY-K485
 
@@ -294,7 +314,8 @@ Remplacer `COM3` par le port affiché dans le Gestionnaire de périphériques (�
 | Température absente ou à 85 °C | résistance de 4,7 kΩ manquante ; fils DATA et VCC inversés ; sonde non détectée au démarrage (voir le journal) |
 | Le mode Bio ne s'active pas | l'ESP32 ne connaît pas encore l'heure (journal : « Heure inconnue ») |
 | Le port COM n'apparaît pas au flashage | essayer l'autre prise USB-C de la carte ; utiliser Chrome ou Edge |
-| Redémarrages de l'ESP32 | chargeur ou câble USB trop faible |
+| Redémarrages de l'ESP32 | sortie du convertisseur sous 4,8 V ou trop faible en courant ; chargeur ou câble USB trop faible |
+| Convertisseur qui chauffe ou grille | tension d'entrée maximale dépassée : il faut un modèle ≥ 60 V |
 | « Consigne non atteinte » permanente | restriction hydraulique (robinets, crépine, tuyaux, masse filtrante) |
 
 Pour le diagnostic du bus, passer `logger: level:` à `DEBUG` dans le YAML.

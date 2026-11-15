@@ -3,7 +3,7 @@
 <defs><marker id="ar" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#5F5E5A"/></marker></defs>
 <rect width="1240" height="800" rx="14" fill="#fff"/>
 <text x="620.0" y="38" text-anchor="middle" font-size="23" font-weight="600" fill="#222">Éclairage LED : câblage complet</text>
-<text x="620.0" y="62" text-anchor="middle" font-size="14" fill="#666">ESP32-S3 · carte Coralux · 2 × LDD-1000H · alimentation 48 V · horloge DS3231</text>
+<text x="620.0" y="62" text-anchor="middle" font-size="14" fill="#666">alimentation 48 V unique · convertisseur 5 V · ESP32-S3 · carte Coralux · 2 × LDD-1000H · DS3231</text>
 <rect x="470" y="90" width="300" height="120" rx="14" fill="#F1EFE8" stroke="#5F5E5A" stroke-width="2"/>
 <text x="620.0" y="118" text-anchor="middle" font-size="17" font-weight="600" fill="#2C2C2A">Alimentation 48 V</text>
 <text x="620.0" y="137" text-anchor="middle" font-size="12" font-weight="400" fill="#5F5E5A">bloc à découpage, par ex. Mean Well</text>
@@ -143,8 +143,9 @@
 <text x="1095" y="470" text-anchor="middle" font-size="11" font-weight="400" fill="#5F5E5A">chaîne en série ≤ 45 V environ</text>
 <text x="1095" y="590" text-anchor="middle" font-size="11" font-weight="400" fill="#5F5E5A">1 A maximum par canal</text>
 <rect x="40" y="300" width="230" height="330" rx="14" fill="#EEEDFE" stroke="#534AB7" stroke-width="2"/>
-<text x="155.0" y="328" text-anchor="middle" font-size="17" font-weight="600" fill="#3C3489">ESP32-S3</text>
-<text x="155.0" y="347" text-anchor="middle" font-size="12" font-weight="400" fill="#534AB7">DevKit N16R8</text>
+<text x="155.0" y="328" text-anchor="middle" font-size="17" font-weight="600" fill="#3C3489"></text>
+<text x="155" y="352" text-anchor="middle" font-size="17" font-weight="600" fill="#3C3489">ESP32-S3</text>
+<text x="155" y="371" text-anchor="middle" font-size="12" font-weight="400" fill="#534AB7">DevKit N16R8</text>
 <circle cx="270" cy="400" r="7" fill="#fff" stroke="#534AB7" stroke-width="2"/>
 <text x="256" y="405" text-anchor="end" font-size="13" font-weight="600" fill="#3C3489">GPIO4</text>
 <circle cx="270" cy="520" r="7" fill="#fff" stroke="#534AB7" stroke-width="2"/>
@@ -167,10 +168,30 @@
 <text x="230" y="618" text-anchor="middle" font-size="11" font-weight="600" fill="#3C3489">GPIO9</text>
 <rect x="120" y="570" width="70" height="24" rx="8" fill="#444441"/>
 <text x="155" y="587" text-anchor="middle" font-size="12" font-weight="400" fill="#fff">USB-C</text>
-<path d="M 40 582 L 20 582 L 20 250 L 110 250" stroke="#444441" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-<rect x="60" y="215" width="180" height="60" rx="10" fill="#F1EFE8" stroke="#5F5E5A" stroke-width="2"/>
-<text x="150.0" y="243" text-anchor="middle" font-size="17" font-weight="600" fill="#2C2C2A">Chargeur USB 5 V</text>
-<text x="150" y="262" text-anchor="middle" font-size="11" font-weight="400" fill="#5F5E5A">séparé du 48 V</text>
+<text x="155" y="560" text-anchor="middle" font-size="10" font-weight="400" fill="#534AB7">flashage uniquement</text>
+<rect x="50" y="105" width="210" height="135" rx="12" fill="#EAF3DE" stroke="#3B6D11" stroke-width="2"/>
+<text x="155.0" y="133" text-anchor="middle" font-size="17" font-weight="600" fill="#27500A">Convertisseur</text>
+<text x="155.0" y="152" text-anchor="middle" font-size="12" font-weight="400" fill="#3B6D11">48 V → 5 V (abaisseur)</text>
+<text x="155" y="174" text-anchor="middle" font-size="12" font-weight="600" fill="#27500A">entrée ≥ 60 V</text>
+<text x="155" y="191" text-anchor="middle" font-size="12" font-weight="600" fill="#27500A">sortie réglée à 5,0 V</text>
+<rect x="251" y="141" width="18" height="18" rx="3" fill="#2E8B57" stroke="#1d5c3a"/><circle cx="260" cy="150" r="4" fill="#cfe9d8" stroke="#1d5c3a"/>
+<text x="244" y="155" text-anchor="end" font-size="13" font-weight="600" fill="#27500A">IN+</text>
+<rect x="251" y="191" width="18" height="18" rx="3" fill="#2E8B57" stroke="#1d5c3a"/><circle cx="260" cy="200" r="4" fill="#cfe9d8" stroke="#1d5c3a"/>
+<text x="244" y="205" text-anchor="end" font-size="13" font-weight="600" fill="#27500A">IN−</text>
+<rect x="101" y="231" width="18" height="18" rx="3" fill="#2E8B57" stroke="#1d5c3a"/><circle cx="110" cy="240" r="4" fill="#cfe9d8" stroke="#1d5c3a"/>
+<text x="110" y="225" text-anchor="middle" font-size="13" font-weight="600" fill="#27500A">OUT+</text>
+<rect x="181" y="231" width="18" height="18" rx="3" fill="#2E8B57" stroke="#1d5c3a"/><circle cx="190" cy="240" r="4" fill="#cfe9d8" stroke="#1d5c3a"/>
+<text x="190" y="225" text-anchor="middle" font-size="13" font-weight="600" fill="#27500A">OUT−</text>
+<path d="M 690 240 L 325 240 L 325 150 L 269 150" stroke="#D0312D" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M 740 255 L 310 255 L 310 200 L 269 200" stroke="#222222" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="690" cy="240" r="5" fill="#D0312D"/><circle cx="740" cy="255" r="5" fill="#222"/>
+<circle cx="110" cy="300" r="7" fill="#fff" stroke="#534AB7" stroke-width="2"/>
+<circle cx="190" cy="300" r="7" fill="#fff" stroke="#534AB7" stroke-width="2"/>
+<text x="110" y="322" text-anchor="middle" font-size="12" font-weight="700" fill="#3C3489">5V</text>
+<text x="190" y="322" text-anchor="middle" font-size="12" font-weight="700" fill="#3C3489">GND</text>
+<path d="M 110 249 L 110 293" stroke="#E8730C" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M 190 249 L 190 293" stroke="#222222" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="118" y="276" text-anchor="start" font-size="11" font-weight="600" fill="#B4560A">5 V</text>
 <rect x="40" y="690" width="520" height="90" rx="12" fill="#E6F1FB" stroke="#185FA5" stroke-width="2"/>
 <text x="300.0" y="718" text-anchor="middle" font-size="17" font-weight="600" fill="#0C447C"></text>
 <text x="60" y="722" text-anchor="start" font-size="17" font-weight="600" fill="#0C447C">Horloge RTC DS3231</text>
@@ -195,11 +216,11 @@
 <text x="490" y="722" text-anchor="start" font-size="12" font-weight="600" fill="#0C447C">pile</text>
 <text x="490" y="738" text-anchor="start" font-size="12" font-weight="400" fill="#185FA5">au dos</text>
 <text x="490" y="754" text-anchor="start" font-size="12" font-weight="400" fill="#185FA5">du module</text>
-<rect x="940" y="640" width="280" height="140" rx="12" fill="#E1F5EE" stroke="#0F6E56" stroke-width="2"/>
-<text x="1080.0" y="668" text-anchor="middle" font-size="17" font-weight="600" fill="#085041">À respecter</text>
-<text x="958" y="688" text-anchor="start" font-size="12" font-weight="400" fill="#085041">• 48 V seulement vers la carte Coralux</text>
-<text x="958" y="707" text-anchor="start" font-size="12" font-weight="400" fill="#085041">• LDD-H : entrée 9 à 56 V max</text>
-<text x="958" y="726" text-anchor="start" font-size="12" font-weight="400" fill="#085041">• relier GND ESP32 au G de la carte</text>
-<text x="958" y="745" text-anchor="start" font-size="12" font-weight="400" fill="#085041">• jamais de 48 V sur l’ESP32</text>
-<text x="958" y="764" text-anchor="start" font-size="12" font-weight="400" fill="#085041">• couper le secteur avant de câbler</text>
+<rect x="930" y="640" width="295" height="140" rx="12" fill="#E1F5EE" stroke="#0F6E56" stroke-width="2"/>
+<text x="1077.5" y="668" text-anchor="middle" font-size="17" font-weight="600" fill="#085041">À respecter</text>
+<text x="946" y="688" text-anchor="start" font-size="12" font-weight="400" fill="#085041">• convertisseur : entrée ≥ 60 V obligatoire</text>
+<text x="946" y="707" text-anchor="start" font-size="12" font-weight="400" fill="#085041">• régler 5,0 V avant de brancher l’ESP32</text>
+<text x="946" y="726" text-anchor="start" font-size="12" font-weight="400" fill="#085041">• 5 V sur la broche 5V, jamais sur 3V3</text>
+<text x="946" y="745" text-anchor="start" font-size="12" font-weight="400" fill="#085041">• USB et 48 V jamais en même temps</text>
+<text x="946" y="764" text-anchor="start" font-size="12" font-weight="400" fill="#085041">• couper le secteur avant de câbler</text>
 </svg>
